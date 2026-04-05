@@ -15,37 +15,76 @@ namespace QuanLyCuaHangTapHoa.Forms
     {
         QLTHDbContext db = new QLTHDbContext();
         int id;
+
         public frmHoaDon()
         {
             InitializeComponent();
         }
+
         private void frmHoaDon_Load(object sender, EventArgs e)
-        {
+        {            
             dataGridView.AutoGenerateColumns = false;
-
-            var ds = db.HoaDon.Select(r => new DanhSachHoaDon
-            {
-                ID = r.ID,
-                MaHoaDon = r.MaHoaDon,
-                HoVaTenNhanVien = r.NhanVien.HoVaTen,
-                HoVaTenKhachHang = r.KhachHang != null ? r.KhachHang.HoVaTen : "",
-                NgayLap = r.NgayLap,
-                TongTienHoaDon = r.HoaDon_ChiTiet.Sum(c => c.SoLuongBan * c.DonGiaBan),
-                XemChiTiet = "Xem chi tiết"
-            }).ToList();
-
-            dataGridView.DataSource = ds;
-
-            // Định dạng cột Tổng tiền
-            if (dataGridView.Columns["TongTienHoaDon"] != null)
-            {
-                dataGridView.Columns["TongTienHoaDon"].DefaultCellStyle.Format = "N0";
-                dataGridView.Columns["TongTienHoaDon"].DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
-            }
-            if (dataGridView.Columns["ID"] != null)
-                dataGridView.Columns["ID"].Visible = false;
+            LoadData();
         }
 
+        // --- HÀM NẠP DỮ LIỆU & TÌM KIẾM ---
+        private void LoadData(string keyword = "")
+        {
+            try
+            {
+                using (var db = new QLTHDbContext())
+                {
+                    var query = db.HoaDon
+                        .Include(r => r.NhanVien)
+                        .Include(r => r.KhachHang)
+                        .AsNoTracking()
+                        .AsQueryable();
+
+                    // Xử lý tìm kiếm đa năng
+                    if (!string.IsNullOrWhiteSpace(keyword))
+                    {
+                        keyword = keyword.ToLower();
+                        query = query.Where(r =>
+                            r.MaHoaDon.ToLower().Contains(keyword) ||
+                            (r.KhachHang != null && r.KhachHang.HoVaTen.ToLower().Contains(keyword)) ||
+                            r.NhanVien.HoVaTen.ToLower().Contains(keyword));
+                    }
+
+                    var ds = query.Select(r => new
+                    {
+                        r.ID,
+                        r.MaHoaDon,
+                        HoVaTenNhanVien = r.NhanVien.HoVaTen,
+                        HoVaTenKhachHang = r.KhachHang != null ? r.KhachHang.HoVaTen : "Khách lẻ",
+                        r.NgayLap,
+                        TongTienHoaDon = r.HoaDon_ChiTiet.Sum(c => c.SoLuongBan * c.DonGiaBan),
+                        XemChiTiet = "Xem chi tiết"
+                    }).ToList();
+
+                    dataGridView.DataSource = ds;
+                    
+                    lblStatus.Text = string.IsNullOrEmpty(keyword)
+                        ? $"Tổng số: {ds.Count} hóa đơn."
+                        : $"Tìm thấy {ds.Count} kết quả cho '{keyword}'.";
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi nạp dữ liệu: {ex.Message}", "Lỗi hệ thống", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+        private void txtTim_TextChanged(object sender, EventArgs e)
+        {
+            LoadData(txtTim.Text.Trim());
+        }
+
+        private void btnLamMoi_Click(object sender, EventArgs e)
+        {
+            txtTim.Clear();
+            LoadData();
+        }
+
+        // ================= NÚT LẬP HÓA ĐƠN =================
         private void btnLapHoaDon_Click(object sender, EventArgs e)
         {
             using (frmHoaDon_ChiTiet f = new frmHoaDon_ChiTiet())
@@ -55,10 +94,10 @@ namespace QuanLyCuaHangTapHoa.Forms
             frmHoaDon_Load(sender, e);
         }
 
+        // ================= NÚT SỬA =================
         private void btnSua_Click(object sender, EventArgs e)
         {
             if (dataGridView.CurrentRow == null) return;
-
             id = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value);
 
             using (frmHoaDon_ChiTiet f = new frmHoaDon_ChiTiet(id))
@@ -66,119 +105,98 @@ namespace QuanLyCuaHangTapHoa.Forms
                 f.ShowDialog();
             }
 
-            frmHoaDon_Load(sender, e);
+            LoadData();
         }
 
+        // ================= NÚT XÓA =================
         private void btnXoa_Click(object sender, EventArgs e)
         {
             if (dataGridView.CurrentRow == null) return;
 
-            if (MessageBox.Show("Xóa hóa đơn này (và toàn bộ chi tiết)?",
-                "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes)
+            string maHD = dataGridView.CurrentRow.Cells["MaHoaDon"].Value.ToString();
+
+            var result = MessageBox.Show($"Xác nhận xóa hóa đơn: {maHD}?\nLưu ý: Hệ thống sẽ tự động hoàn trả số lượng hàng vào kho.",
+                                        "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
             {
-                id = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value);
-
-                var hd = db.HoaDon.Find(id);
-
-                if (hd != null)
+                try
                 {
-                    var chiTiet = db.HoaDon_ChiTiet.Where(c => c.HoaDonID == id).ToList();
-
-                    // Trả lại tồn kho
-                    foreach (var item in chiTiet)
+                    int deleteId = (int)dataGridView.CurrentRow.Cells["ID"].Value;
+                    using (var db = new QLTHDbContext())
                     {
-                        var sp = db.SanPham.Find(item.SanPhamID);
-                        if (sp != null)
-                            sp.SoLuongTon += item.SoLuongBan;
+                        var hd = db.HoaDon.Include(h => h.HoaDon_ChiTiet).FirstOrDefault(h => h.ID == deleteId);
+                        if (hd != null)
+                        {
+                            foreach (var item in hd.HoaDon_ChiTiet)
+                            {
+                                var sp = db.SanPham.Find(item.SanPhamID);
+                                if (sp != null) sp.SoLuongTon += item.SoLuongBan;
+                            }
+                            db.HoaDon_ChiTiet.RemoveRange(hd.HoaDon_ChiTiet);
+                            db.HoaDon.Remove(hd);
+                            db.SaveChanges();
+
+                            MessageBox.Show($"Đã xóa hóa đơn {maHD} thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            LoadData();
+                        }
                     }
-
-                    db.HoaDon_ChiTiet.RemoveRange(chiTiet);
-                    db.HoaDon.Remove(hd);
-
-                    db.SaveChanges();
                 }
-
-                frmHoaDon_Load(sender, e);
-            }
-        }
-        // ================== XEM CHI TIẾT ==================
-        private void dataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-            if (dataGridView.Columns[e.ColumnIndex].Name == "XemChiTiet")
-            {
-                int id = Convert.ToInt32(dataGridView.Rows[e.RowIndex].Cells["ID"].Value);
-
-                using (frmHoaDon_ChiTiet f = new frmHoaDon_ChiTiet(id))
+                catch (Exception ex)
                 {
-                    f.ShowDialog();
+                    MessageBox.Show($"Không thể xóa hóa đơn. Lỗi: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
-
-                frmHoaDon_Load(sender, e);
             }
-        }
-        private void btnThoat_Click(object sender, EventArgs e)
-        {
-            this.Close();
-        }
+        }               
 
+        // ================= NÚT XUẤT =================
         private void btnXuat_Click(object sender, EventArgs e)
         {
             SaveFileDialog save = new SaveFileDialog();
             save.Filter = "Excel (*.xlsx)|*.xlsx";
-            save.FileName = "HoaDon_" + DateTime.Now.ToString("yyyyMMdd") + ".xlsx";
+            save.FileName = $"HoaDon_{DateTime.Now:yyyyMMdd_HHmm}.xlsx";
 
             if (save.ShowDialog() == DialogResult.OK)
             {
                 try
                 {
+                    using (var db = new QLTHDbContext())
                     using (XLWorkbook wb = new XLWorkbook())
                     {
-                        // ================= SHEET 1: HÓA ĐƠN =================
-                        DataTable dtHoaDon = new DataTable();
+                        // --- SHEET 1: HÓA ĐƠN ---
+                        var dtHoaDon = new DataTable("HoaDon");
+                        dtHoaDon.Columns.AddRange(new DataColumn[] {
+                            new DataColumn("Mã Hóa Đơn"),
+                            new DataColumn("Nhân Viên"),
+                            new DataColumn("Khách Hàng"),
+                            new DataColumn("Ngày Lập"),
+                            new DataColumn("Tổng Tiền", typeof(decimal))
+                        });
 
-                        dtHoaDon.Columns.Add("MaHoaDon");
-                        dtHoaDon.Columns.Add("NhanVien");
-                        dtHoaDon.Columns.Add("KhachHang");
-                        dtHoaDon.Columns.Add("NgayLap");
-                        dtHoaDon.Columns.Add("TongTien");
-
-                        var dsHoaDon = db.HoaDon
-                         .Include(h => h.NhanVien)
-                         .Include(h => h.KhachHang)
-                         .Include(h => h.HoaDon_ChiTiet)
-                         .ToList();
-
+                        var dsHoaDon = db.HoaDon.Include(h => h.NhanVien).Include(h => h.KhachHang).Include(h => h.HoaDon_ChiTiet).ToList();
                         foreach (var hd in dsHoaDon)
                         {
-                            int tong = hd.HoaDon_ChiTiet.Sum(x => x.SoLuongBan * x.DonGiaBan);
-
                             dtHoaDon.Rows.Add(
                                 hd.MaHoaDon,
-                                hd.NhanVien.HoVaTen,
-                                hd.KhachHang.HoVaTen,
+                                hd.NhanVien?.HoVaTen ?? "N/A",
+                                hd.KhachHang?.HoVaTen ?? "Khách lẻ", // Tránh lỗi Null ở đây
                                 hd.NgayLap.ToString("dd/MM/yyyy"),
-                                tong
+                                hd.HoaDon_ChiTiet.Sum(x => x.SoLuongBan * x.DonGiaBan)
                             );
                         }
+                        wb.Worksheets.Add(dtHoaDon).Columns().AdjustToContents();
 
-                        var sheet1 = wb.Worksheets.Add(dtHoaDon, "HoaDon");
-                        sheet1.Row(1).Style.Font.Bold = true;
-                        sheet1.Columns().AdjustToContents();
+                        // --- SHEET 2: CHI TIẾT ---
+                        var dtCT = new DataTable("ChiTiet");
+                        dtCT.Columns.AddRange(new DataColumn[] {
+                            new DataColumn("Mã Hóa Đơn"),
+                            new DataColumn("Sản Phẩm"),
+                            new DataColumn("Số Lượng"),
+                            new DataColumn("Đơn Giá"),
+                            new DataColumn("Thành Tiền")
+                        });
 
-                        // ================= SHEET 2: CHI TIẾT =================
-                        DataTable dtCT = new DataTable();
-
-                        dtCT.Columns.Add("MaHoaDon");
-                        dtCT.Columns.Add("SanPham");
-                        dtCT.Columns.Add("SoLuong");
-                        dtCT.Columns.Add("DonGia");
-                        dtCT.Columns.Add("ThanhTien");
-
-                        var dsCT = db.HoaDon_ChiTiet
-                            .Include(c => c.HoaDon)
-                            .Include(c => c.SanPham)
-                            .ToList();
-
+                        var dsCT = db.HoaDon_ChiTiet.Include(c => c.HoaDon).Include(c => c.SanPham).ToList();
                         foreach (var ct in dsCT)
                         {
                             dtCT.Rows.Add(
@@ -189,50 +207,64 @@ namespace QuanLyCuaHangTapHoa.Forms
                                 ct.SoLuongBan * ct.DonGiaBan
                             );
                         }
+                        wb.Worksheets.Add(dtCT).Columns().AdjustToContents();
 
-                        var sheet2 = wb.Worksheets.Add(dtCT, "HoaDon_ChiTiet");
-                        sheet2.Row(1).Style.Font.Bold = true;
-                        sheet2.Columns().AdjustToContents();
-
-                        // ================= LƯU FILE =================
                         wb.SaveAs(save.FileName);
+                        MessageBox.Show("Xuất dữ liệu Excel thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     }
-
-                    MessageBox.Show("Xuất hóa đơn thành công!");
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Lỗi: " + ex.Message);
+                    MessageBox.Show("Lỗi xuất Excel: " + ex.Message);
                 }
             }
         }
 
+        // ================= NÚT IN HÓA ĐƠN =================
         private void btnInHoaDon_Click(object sender, EventArgs e)
         {
-            id = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value.ToString());
-            using (frmInHoaDon inHoaDon = new frmInHoaDon(id))
+            if (dataGridView.CurrentRow == null)
             {
-                inHoaDon.ShowDialog();
+                MessageBox.Show("Vui lòng chọn một hóa đơn để thực hiện in!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
-            if (dataGridView.CurrentRow != null)
-            {
-                var value = dataGridView.CurrentRow.Cells["ID"].Value;
 
-                if (value != null && int.TryParse(value.ToString(), out int id))
-                {
-                    using (frmInHoaDon inHoaDon = new frmInHoaDon(id))
-                    {
-                        inHoaDon.ShowDialog();
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Không lấy được ID hóa đơn!");
-                }
+            int printId = (int)dataGridView.CurrentRow.Cells["ID"].Value;
+
+            // Mở form In theo dạng MDI Child
+            frmInHoaDon fIn = new frmInHoaDon(printId);
+
+            if (this.MdiParent != null)
+            {
+                fIn.MdiParent = this.MdiParent; // Mở trong form cha
+                fIn.WindowState = FormWindowState.Maximized; // Phóng to để dễ xem báo cáo
+                fIn.Show();
             }
             else
             {
-                MessageBox.Show("Vui lòng chọn hóa đơn!");
+                fIn.ShowDialog(); // Nếu không có form cha thì mở độc lập
+            }
+        }
+
+        // ================= NÚT THOÁT =================
+        private void btnThoat_Click(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        // ================== XEM CHI TIẾT ==================
+        private void dataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            if (dataGridView.Columns[e.ColumnIndex].Name == "XemChiTiet")
+            {
+                int detailId = Convert.ToInt32(dataGridView.Rows[e.RowIndex].Cells["ID"].Value);
+                using (frmHoaDon_ChiTiet f = new frmHoaDon_ChiTiet(detailId))
+                {
+                    f.ShowDialog();
+                }
+                LoadData();
             }
         }
     }

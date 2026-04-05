@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
             groupBox1 = new GroupBox();
             dataGridView = new DataGridView();
             ID = new DataGridViewTextBoxColumn();
@@ -45,11 +45,12 @@
             btnSua = new Button();
             btnXoa = new Button();
             btnThoat = new Button();
-            btnTim = new Button();
             btnXuat = new Button();
             label1 = new Label();
             txtTim = new TextBox();
             tableLayoutPanel1 = new TableLayoutPanel();
+            btnLamMoi = new Button();
+            lblStatus = new Label();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView).BeginInit();
             tableLayoutPanel1.SuspendLayout();
@@ -59,7 +60,7 @@
             // 
             groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             groupBox1.Controls.Add(dataGridView);
-            groupBox1.Location = new Point(12, 130);
+            groupBox1.Location = new Point(12, 184);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(1438, 423);
             groupBox1.TabIndex = 0;
@@ -119,9 +120,9 @@
             // NgayLap
             // 
             NgayLap.DataPropertyName = "NgayLap";
-            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle1.Format = "dd/MM/yyyy";
-            NgayLap.DefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle4.Format = "dd/MM/yyyy";
+            NgayLap.DefaultCellStyle = dataGridViewCellStyle4;
             NgayLap.HeaderText = "Ngày lập";
             NgayLap.MinimumWidth = 10;
             NgayLap.Name = "NgayLap";
@@ -130,9 +131,9 @@
             // TongTienHoaDon
             // 
             TongTienHoaDon.DataPropertyName = "TongTienHoaDon";
-            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle2.ForeColor = Color.FromArgb(0, 0, 192);
-            TongTienHoaDon.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle5.ForeColor = Color.FromArgb(0, 0, 192);
+            TongTienHoaDon.DefaultCellStyle = dataGridViewCellStyle5;
             TongTienHoaDon.HeaderText = "Tổng tiền";
             TongTienHoaDon.MinimumWidth = 10;
             TongTienHoaDon.Name = "TongTienHoaDon";
@@ -141,8 +142,8 @@
             // XemChiTiet
             // 
             XemChiTiet.DataPropertyName = "XemChiTiet";
-            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            XemChiTiet.DefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            XemChiTiet.DefaultCellStyle = dataGridViewCellStyle6;
             XemChiTiet.HeaderText = "Chi tiết";
             XemChiTiet.MinimumWidth = 10;
             XemChiTiet.Name = "XemChiTiet";
@@ -200,7 +201,7 @@
             // 
             // btnThoat
             // 
-            btnThoat.Location = new Point(1103, 32);
+            btnThoat.Location = new Point(1297, 32);
             btnThoat.Name = "btnThoat";
             btnThoat.Size = new Size(150, 70);
             btnThoat.TabIndex = 23;
@@ -208,15 +209,6 @@
             btnThoat.UseVisualStyleBackColor = true;
             btnThoat.Visible = false;
             btnThoat.Click += btnThoat_Click;
-            // 
-            // btnTim
-            // 
-            btnTim.Location = new Point(772, 32);
-            btnTim.Name = "btnTim";
-            btnTim.Size = new Size(150, 70);
-            btnTim.TabIndex = 24;
-            btnTim.Text = "Tìm";
-            btnTim.UseVisualStyleBackColor = true;
             // 
             // btnXuat
             // 
@@ -247,6 +239,7 @@
             txtTim.Name = "txtTim";
             txtTim.Size = new Size(556, 39);
             txtTim.TabIndex = 28;
+            txtTim.TextChanged += txtTim_TextChanged;
             // 
             // tableLayoutPanel1
             // 
@@ -262,12 +255,31 @@
             tableLayoutPanel1.Controls.Add(btnXoa, 3, 0);
             tableLayoutPanel1.Controls.Add(btnSua, 2, 0);
             tableLayoutPanel1.Controls.Add(btnLapHoaDon, 0, 0);
-            tableLayoutPanel1.Location = new Point(15, 594);
+            tableLayoutPanel1.Location = new Point(15, 648);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 1;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
             tableLayoutPanel1.Size = new Size(1435, 90);
             tableLayoutPanel1.TabIndex = 29;
+            // 
+            // btnLamMoi
+            // 
+            btnLamMoi.Location = new Point(953, 32);
+            btnLamMoi.Name = "btnLamMoi";
+            btnLamMoi.Size = new Size(150, 70);
+            btnLamMoi.TabIndex = 30;
+            btnLamMoi.Text = "Làm mới";
+            btnLamMoi.UseVisualStyleBackColor = true;
+            btnLamMoi.Click += btnLamMoi_Click;
+            // 
+            // lblStatus
+            // 
+            lblStatus.AutoSize = true;
+            lblStatus.Location = new Point(173, 118);
+            lblStatus.Name = "lblStatus";
+            lblStatus.Size = new Size(78, 32);
+            lblStatus.TabIndex = 31;
+            lblStatus.Text = "label2";
             // 
             // frmHoaDon
             // 
@@ -275,15 +287,17 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.MistyRose;
             ClientSize = new Size(1481, 847);
+            Controls.Add(lblStatus);
+            Controls.Add(btnLamMoi);
             Controls.Add(tableLayoutPanel1);
             Controls.Add(txtTim);
             Controls.Add(label1);
-            Controls.Add(btnTim);
             Controls.Add(btnThoat);
             Controls.Add(groupBox1);
             Name = "frmHoaDon";
             Text = "Hóa đơn";
             Load += frmHoaDon_Load;
+            TextChanged += txtTim_TextChanged;
             groupBox1.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)dataGridView).EndInit();
             tableLayoutPanel1.ResumeLayout(false);
@@ -300,7 +314,6 @@
         private Button btnSua;
         private Button btnXoa;
         private Button btnThoat;
-        private Button btnTim;
         private Button btnXuat;
         private DataGridViewTextBoxColumn ID;
         private DataGridViewTextBoxColumn MaHoaDon;
@@ -312,5 +325,7 @@
         private Label label1;
         private TextBox txtTim;
         private TableLayoutPanel tableLayoutPanel1;
+        private Button btnLamMoi;
+        private Label lblStatus;
     }
 }

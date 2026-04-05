@@ -1,4 +1,6 @@
-﻿using QuanLyCuaHangTapHoa.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using QuanLyCuaHangTapHoa.Data;
+using QuanLyCuaHangTapHoa.Reports;
 using System;
 using System.ComponentModel;
 using System.Linq;
@@ -10,22 +12,57 @@ namespace QuanLyCuaHangTapHoa.Forms
     public partial class frmHoaDon_ChiTiet : Form
     {
         QLTHDbContext db = new QLTHDbContext();
-        int idHoaDon = 0;                                   // 0 = tạo mới, >0 = sửa
+        int idHoaDon = 0;                                   
         BindingList<DanhSachHoaDon_ChiTiet> chiTietList = new BindingList<DanhSachHoaDon_ChiTiet>();
+
         public frmHoaDon_ChiTiet(int maHoaDon = 0)
         {
             InitializeComponent();
             idHoaDon = maHoaDon;
         }
+
         private void frmHoaDon_ChiTiet_Load(object sender, EventArgs e)
         {
-            LayNhanVien();
-            LayKhachHang();
-            LaySanPham();
-
+            LoadComboboxData();
             dataGridView.AutoGenerateColumns = false;
 
             if (idHoaDon != 0)
+            {
+                this.Text = "Cập nhật hóa đơn";
+                LoadHoaDonCu();
+            }
+            else
+            {
+                this.Text = "Lập hóa đơn mới";
+            }
+
+            dataGridView.DataSource = chiTietList;
+            CapNhatTrangThaiUI();
+        }
+
+        // ================= COMBOBOX =================
+        private void LoadComboboxData()
+        {
+            using (var db = new QLTHDbContext())
+            {
+                cboNhanVien.DataSource = db.NhanVien.AsNoTracking().ToList();
+                cboNhanVien.DisplayMember = "HoVaTen";
+                cboNhanVien.ValueMember = "ID";
+
+                cboKhachHang.DataSource = db.KhachHang.AsNoTracking().ToList();
+                cboKhachHang.DisplayMember = "HoVaTen";
+                cboKhachHang.ValueMember = "ID";
+
+                cboSanPham.DataSource = db.SanPham.AsNoTracking().ToList();
+                cboSanPham.DisplayMember = "TenSanPham";
+                cboSanPham.ValueMember = "ID";
+                cboSanPham.SelectedIndex = -1; // Mặc định không chọn
+            }
+        }
+
+        private void LoadHoaDonCu()
+        {
+            using (var db = new QLTHDbContext())
             {
                 var hd = db.HoaDon.Find(idHoaDon);
                 if (hd != null)
@@ -33,244 +70,231 @@ namespace QuanLyCuaHangTapHoa.Forms
                     cboNhanVien.SelectedValue = hd.NhanVienID;
                     cboKhachHang.SelectedValue = hd.KhachHangID;
                     txtGhiChuHoaDon.Text = hd.GhiChu;
+
+                    var ds = db.HoaDon_ChiTiet
+                        .Where(c => c.HoaDonID == idHoaDon)
+                        .Select(c => new DanhSachHoaDon_ChiTiet
+                        {
+                            ID = c.ID,
+                            SanPhamID = c.SanPhamID,
+                            TenSanPham = c.SanPham.TenSanPham,
+                            DonGiaBan = c.DonGiaBan,
+                            SoLuongBan = (short)c.SoLuongBan,
+                            ThanhTien = c.SoLuongBan * c.DonGiaBan
+                        }).ToList();
+
+                    chiTietList = new BindingList<DanhSachHoaDon_ChiTiet>(ds);
                 }
-
-                var ds = db.HoaDon_ChiTiet
-                    .Where(c => c.HoaDonID == idHoaDon)
-                    .Select(c => new DanhSachHoaDon_ChiTiet
-                    {
-                        ID = c.ID,
-                        SanPhamID = c.SanPhamID,
-                        TenSanPham = c.SanPham != null ? c.SanPham.TenSanPham : "",
-                        DonGiaBan = c.DonGiaBan,
-                        SoLuongBan = (short)c.SoLuongBan,
-                        ThanhTien = c.SoLuongBan * c.DonGiaBan
-                    }).ToList();
-
-                chiTietList = new BindingList<DanhSachHoaDon_ChiTiet>(ds);
             }
-
-            dataGridView.DataSource = chiTietList;
-
-            CapNhatTrangThaiNut();
             CapNhatTongTien();
         }
 
-        // ================= COMBOBOX =================
-        void LayNhanVien()
-        {
-            cboNhanVien.DataSource = db.NhanVien.ToList();
-            cboNhanVien.DisplayMember = "HoVaTen";
-            cboNhanVien.ValueMember = "ID";
-        }
-
-        void LayKhachHang()
-        {
-            cboKhachHang.DataSource = db.KhachHang.ToList();
-            cboKhachHang.DisplayMember = "HoVaTen";
-            cboKhachHang.ValueMember = "ID";
-        }
-
-        void LaySanPham()
-        {
-            cboSanPham.DataSource = db.SanPham.ToList();
-            cboSanPham.DisplayMember = "TenSanPham";
-            cboSanPham.ValueMember = "ID";
-        }
-
-        // ================= UI =================
-        void CapNhatTrangThaiNut()
+        void CapNhatTrangThaiUI()
         {
             btnLuuHoaDon.Enabled = chiTietList.Count > 0;
-            btnXoa.Enabled = dataGridView.CurrentRow != null;
+            btnXoa.Enabled = chiTietList.Count > 0;
         }
 
         void CapNhatTongTien()
         {
-            lblTongTien.Text = chiTietList.Sum(x => x.ThanhTien).ToString("N0");
+            decimal tong = chiTietList.Sum(x => (decimal)x.ThanhTien);
+            lblTongTien.Text = string.Format("{0:N0} VNĐ", tong);
         }
 
-        // ================= CHỌN SẢN PHẨM =================
         private void cboSanPham_SelectedIndexChanged(object sender, EventArgs e)
         {
-            if (cboSanPham.SelectedValue == null ||
-        !   int.TryParse(cboSanPham.SelectedValue.ToString(), out int maSP))
-                return;
-
-            var sp = db.SanPham.Find(maSP);
-
-            if (sp != null)
+            if (cboSanPham.SelectedValue != null && int.TryParse(cboSanPham.SelectedValue.ToString(), out int maSP))
             {
-                numDonGiaBan.Value = sp.DonGiaBan;
-            }
-        }
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            if (cboSanPham.SelectedValue == null ||
-                !int.TryParse(cboSanPham.SelectedValue.ToString(), out int maSP))
-            {
-                MessageBox.Show("Chọn sản phẩm!");
-                return;
-            }
-
-            if (numSoLuongBan.Value <= 0)
-            {
-                MessageBox.Show("Số lượng phải > 0!");
-                return;
-            }
-
-            var sp = db.SanPham.Find(maSP);
-            if (sp == null)
-            {
-                MessageBox.Show("Sản phẩm không tồn tại!");
-                return;
-            }
-
-            int soLuongMoi = (int)numSoLuongBan.Value;
-            var existing = chiTietList.FirstOrDefault(x => x.SanPhamID == maSP);
-
-            if (existing != null)
-            {
-                int chenhlech = soLuongMoi - existing.SoLuongBan;
-
-                if (sp.SoLuongTon < chenhlech)
+                using (var db = new QLTHDbContext())
                 {
-                    MessageBox.Show("Không đủ tồn!");
-                    return;
+                    var sp = db.SanPham.Find(maSP);
+                    if (sp != null) numDonGiaBan.Value = sp.DonGiaBan;
                 }
-
-                existing.SoLuongBan = (short)soLuongMoi;
-                existing.DonGiaBan = (int)numDonGiaBan.Value;
-                existing.ThanhTien = existing.SoLuongBan * existing.DonGiaBan;
             }
-            else
+        }
+
+        // ======================= CRUD =======================
+
+        // ================= NÚT XÁC NHẬN BÁN =================
+        private void btnXacNhanBan_Click(object sender, EventArgs e)
+        {
+            // 1. Ràng buộc chọn sản phẩm
+            if (cboSanPham.SelectedValue == null)
             {
+                MessageBox.Show("Vui lòng chọn sản phẩm!", "Nhắc nhở", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                cboSanPham.Focus();
+                return;
+            }
+
+            // 2. Ràng buộc số lượng >= 1
+            if (numSoLuongBan.Value < 1)
+            {
+                MessageBox.Show("Số lượng bán phải lớn hơn hoặc bằng 1!", "Lỗi nhập liệu", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                numSoLuongBan.Focus();
+                return;
+            }
+
+            int maSP = (int)cboSanPham.SelectedValue;
+            int soLuongMoi = (int)numSoLuongBan.Value;
+
+            using (var db = new QLTHDbContext())
+            {
+                var sp = db.SanPham.Find(maSP);
+                if (sp == null) return;
+
+                // Kiểm tra tồn kho thực tế
                 if (sp.SoLuongTon < soLuongMoi)
                 {
-                    MessageBox.Show($"Chỉ còn {sp.SoLuongTon} sản phẩm!");
+                    MessageBox.Show($"Kho không đủ hàng! Tồn hiện tại: {sp.SoLuongTon}", "Hết hàng", MessageBoxButtons.OK, MessageBoxIcon.Stop);
                     return;
                 }
 
-                chiTietList.Add(new DanhSachHoaDon_ChiTiet
+                var existing = chiTietList.FirstOrDefault(x => x.SanPhamID == maSP);
+                if (existing != null)
                 {
-                    SanPhamID = maSP,
-                    TenSanPham = cboSanPham.Text,
-                    DonGiaBan = (int)numDonGiaBan.Value,
-                    SoLuongBan = (short)soLuongMoi,
-                    ThanhTien = soLuongMoi * (int)numDonGiaBan.Value
-                });
+                    existing.SoLuongBan += (short)soLuongMoi;
+                    existing.ThanhTien = existing.SoLuongBan * (int)numDonGiaBan.Value;
+                }
+                else
+                {
+                    chiTietList.Add(new DanhSachHoaDon_ChiTiet
+                    {
+                        SanPhamID = maSP,
+                        TenSanPham = cboSanPham.Text,
+                        DonGiaBan = (int)numDonGiaBan.Value,
+                        SoLuongBan = (short)soLuongMoi,
+                        ThanhTien = soLuongMoi * (int)numDonGiaBan.Value
+                    });
+                }
             }
 
             dataGridView.Refresh();
-            CapNhatTrangThaiNut();
+            CapNhatTrangThaiUI();
             CapNhatTongTien();
-
             numSoLuongBan.Value = 1;
         }
 
+        // ================= NÚT XÓA =================
         private void btnXoa_Click(object sender, EventArgs e)
         {
             if (dataGridView.CurrentRow == null) return;
 
-            int maSP = Convert.ToInt32(dataGridView.CurrentRow.Cells["SanPhamID"].Value);
-            var item = chiTietList.FirstOrDefault(x => x.SanPhamID == maSP);
-
-            if (item != null)
-                chiTietList.Remove(item);
-
-            CapNhatTrangThaiNut();
-            CapNhatTongTien();
+            if (MessageBox.Show("Xóa sản phẩm này khỏi danh sách chờ?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                int rowIndex = dataGridView.CurrentRow.Index;
+                chiTietList.RemoveAt(rowIndex);
+                CapNhatTrangThaiUI();
+                CapNhatTongTien();
+            }
         }
 
+        // ================= NÚT LƯU =================
         private void btnLuuHoaDon_Click(object sender, EventArgs e)
         {
-            if (cboNhanVien.SelectedValue == null)
+            if (ThucHienLuuHoaDon()) // Gọi hàm lưu chung
             {
-                MessageBox.Show("Chọn nhân viên!");
-                return;
+                MessageBox.Show("Lưu hóa đơn thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                this.Close(); // Lưu xong thì đóng form
             }
+        }
+        
+        private bool ThucHienLuuHoaDon()
+        {            
+            if (cboNhanVien.SelectedValue == null) { MessageBox.Show("Vui lòng chọn Nhân viên!"); return false; }
+            if (cboKhachHang.SelectedValue == null) { MessageBox.Show("Vui lòng chọn Khách hàng!"); return false; }
+            if (chiTietList.Count == 0) { MessageBox.Show("Vui lòng thêm sản phẩm!"); return false; }
 
-            if (idHoaDon == 0)
+            try
             {
-                var hd = new HoaDon
+                using (var db = new QLTHDbContext())
                 {
-                    MaHoaDon = MaTuDong.SinhMaHoaDon(),
-                    NhanVienID = Convert.ToInt32(cboNhanVien.SelectedValue),
-                    KhachHangID = (int)(cboKhachHang.SelectedValue != null
-                        ? Convert.ToInt32(cboKhachHang.SelectedValue)
-                        : (int?)null),
-                    NgayLap = DateTime.Now,
-                    GhiChu = txtGhiChuHoaDon.Text,
-                    TongTien = chiTietList.Sum(x => x.ThanhTien)
-                };
-
-                db.HoaDon.Add(hd);
-                db.SaveChanges();
-
-                foreach (var item in chiTietList)
-                {
-                    db.HoaDon_ChiTiet.Add(new HoaDon_ChiTiet
+                    HoaDon hd;
+                    if (idHoaDon == 0)
                     {
-                        HoaDonID = hd.ID,
-                        SanPhamID = item.SanPhamID,
-                        SoLuongBan = item.SoLuongBan,
-                        DonGiaBan = item.DonGiaBan
-                    });
-
-                    var sp = db.SanPham.Find(item.SanPhamID);
-                    if (sp != null) sp.SoLuongTon -= item.SoLuongBan;
-                }
-            }
-            else
-            {
-                var hd = db.HoaDon.Find(idHoaDon);
-                if (hd != null)
-                {
-                    hd.NhanVienID = Convert.ToInt32(cboNhanVien.SelectedValue);
-                    hd.KhachHangID = (int)(cboKhachHang.SelectedValue != null
-                        ? Convert.ToInt32(cboKhachHang.SelectedValue)
-                        : (int?)null);
-                    hd.GhiChu = txtGhiChuHoaDon.Text;
-                    hd.TongTien = chiTietList.Sum(x => x.ThanhTien);
-
-                    var old = db.HoaDon_ChiTiet.Where(c => c.HoaDonID == idHoaDon).ToList();
-
-                    foreach (var c in old)
+                        hd = new HoaDon { MaHoaDon = MaTuDong.SinhMaHoaDon(), NgayLap = DateTime.Now };
+                        db.HoaDon.Add(hd);
+                    }
+                    else
                     {
-                        var sp = db.SanPham.Find(c.SanPhamID);
-                        if (sp != null) sp.SoLuongTon += c.SoLuongBan;
+                        hd = db.HoaDon.Include(h => h.HoaDon_ChiTiet).FirstOrDefault(h => h.ID == idHoaDon);
+                        foreach (var c in hd.HoaDon_ChiTiet)
+                        {
+                            var sp = db.SanPham.Find(c.SanPhamID);
+                            if (sp != null) sp.SoLuongTon += c.SoLuongBan;
+                        }
+                        db.HoaDon_ChiTiet.RemoveRange(hd.HoaDon_ChiTiet);
                     }
 
-                    db.HoaDon_ChiTiet.RemoveRange(old);
+                    hd.NhanVienID = Convert.ToInt32(cboNhanVien.SelectedValue);
+                    hd.KhachHangID = Convert.ToInt32(cboKhachHang.SelectedValue);
+                    hd.GhiChu = txtGhiChuHoaDon.Text;
+                    hd.TongTien = chiTietList.Sum(x => x.ThanhTien);
 
                     foreach (var item in chiTietList)
                     {
                         db.HoaDon_ChiTiet.Add(new HoaDon_ChiTiet
                         {
-                            HoaDonID = idHoaDon,
+                            HoaDon = hd,
                             SanPhamID = item.SanPhamID,
                             SoLuongBan = item.SoLuongBan,
                             DonGiaBan = item.DonGiaBan
                         });
-
                         var sp = db.SanPham.Find(item.SanPhamID);
                         if (sp != null) sp.SoLuongTon -= item.SoLuongBan;
                     }
+
+                    db.SaveChanges();
+                    
+                    idHoaDon = hd.ID;
+                    return true;
                 }
             }
-
-            db.SaveChanges();
-            MessageBox.Show("Lưu thành công!");
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: " + ex.Message);
+                return false;
+            }
         }
+
+        // ================= NÚT THOÁT =================
         private void btnThoat_Click(object sender, EventArgs e)
         {
+            if (chiTietList.Count > 0)
+            {
+                if (MessageBox.Show("Dữ liệu chưa được lưu, bạn có chắc muốn thoát?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.No)
+                    return;
+            }
             this.Close();
         }
 
+        // ================= NÚT IN HÓA ĐƠN =================
+        private void btnInHoaDon_Click(object sender, EventArgs e)
+        {
+            // Nếu hóa đơn mới (id=0), bắt buộc lưu trước
+            if (idHoaDon == 0)
+            {
+                var res = MessageBox.Show("Bạn cần lưu hóa đơn trước khi in. Lưu ngay?", "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (res == DialogResult.Yes)
+                {
+                    if (!ThucHienLuuHoaDon()) return; // Lưu thất bại thì dừng
+                }
+                else return; // Không lưu thì không in
+            }
+
+            // Thực hiện in
+            frmInHoaDon fIn = new frmInHoaDon(idHoaDon);
+
+            if (this.MdiParent != null)
+            {
+                fIn.MdiParent = this.MdiParent;
+                fIn.WindowState = FormWindowState.Maximized;
+                fIn.Show();
+                this.Close(); // In xong thì đóng form chi tiết
+            }
+            else
+            {
+                fIn.ShowDialog();
+            }
+        }
     }
 }

@@ -55,6 +55,7 @@
             btnInHoaDon = new Button();
             btnThoat = new Button();
             lblTongTien = new Label();
+            label7 = new Label();
             groupBox1.SuspendLayout();
             groupBox2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView).BeginInit();
@@ -118,7 +119,6 @@
             label2.Size = new Size(145, 32);
             label2.TabIndex = 1;
             label2.Text = "Khách hàng:";
-            label2.Click += label2_Click;
             // 
             // label1
             // 
@@ -225,7 +225,7 @@
             btnXacNhanBan.TabIndex = 6;
             btnXacNhanBan.Text = "Xác nhận bán";
             btnXacNhanBan.UseVisualStyleBackColor = true;
-            btnXacNhanBan.Click += button1_Click;
+            btnXacNhanBan.Click += btnXacNhanBan_Click;
             // 
             // numDonGiaBan
             // 
@@ -284,7 +284,7 @@
             // btnLuuHoaDon
             // 
             btnLuuHoaDon.BackColor = SystemColors.Control;
-            btnLuuHoaDon.Location = new Point(155, 744);
+            btnLuuHoaDon.Location = new Point(155, 785);
             btnLuuHoaDon.Name = "btnLuuHoaDon";
             btnLuuHoaDon.Size = new Size(198, 65);
             btnLuuHoaDon.TabIndex = 2;
@@ -296,17 +296,18 @@
             // 
             btnInHoaDon.BackColor = SystemColors.Control;
             btnInHoaDon.ForeColor = Color.Green;
-            btnInHoaDon.Location = new Point(435, 744);
+            btnInHoaDon.Location = new Point(435, 785);
             btnInHoaDon.Name = "btnInHoaDon";
             btnInHoaDon.Size = new Size(223, 65);
             btnInHoaDon.TabIndex = 3;
             btnInHoaDon.Text = "In hóa đơn";
             btnInHoaDon.UseVisualStyleBackColor = false;
+            btnInHoaDon.Click += btnInHoaDon_Click;
             // 
             // btnThoat
             // 
             btnThoat.BackColor = SystemColors.Control;
-            btnThoat.Location = new Point(724, 744);
+            btnThoat.Location = new Point(724, 785);
             btnThoat.Name = "btnThoat";
             btnThoat.Size = new Size(185, 65);
             btnThoat.TabIndex = 24;
@@ -317,19 +318,28 @@
             // lblTongTien
             // 
             lblTongTien.AutoSize = true;
-            lblTongTien.Location = new Point(15, 803);
+            lblTongTien.Location = new Point(959, 735);
             lblTongTien.Name = "lblTongTien";
             lblTongTien.Size = new Size(78, 32);
             lblTongTien.TabIndex = 25;
             lblTongTien.Text = "label7";
-            lblTongTien.Visible = false;
+            // 
+            // label7
+            // 
+            label7.AutoSize = true;
+            label7.Location = new Point(879, 735);
+            label7.Name = "label7";
+            label7.Size = new Size(74, 32);
+            label7.TabIndex = 26;
+            label7.Text = "Tổng:";
             // 
             // frmHoaDon_ChiTiet
             // 
             AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = SystemColors.Control;
-            ClientSize = new Size(1105, 829);
+            ClientSize = new Size(1105, 875);
+            Controls.Add(label7);
             Controls.Add(lblTongTien);
             Controls.Add(btnThoat);
             Controls.Add(btnInHoaDon);
@@ -379,5 +389,6 @@
         private Button btnInHoaDon;
         private Button btnThoat;
         private Label lblTongTien;
+        private Label label7;
     }
 }

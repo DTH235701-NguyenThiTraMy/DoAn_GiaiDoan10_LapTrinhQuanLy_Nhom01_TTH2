@@ -231,7 +231,9 @@
                 <TextRuns>
                   <TextRun>
                     <Value>Đơn vị bán hàng:</Value>
-                    <Style />
+                    <Style>
+                      <FontWeight>Bold</FontWeight>
+                    </Style>
                   </TextRun>
                 </TextRuns>
                 <Style />
@@ -261,7 +263,9 @@
                 <TextRuns>
                   <TextRun>
                     <Value>Họ tên người mua hàng:</Value>
-                    <Style />
+                    <Style>
+                      <FontWeight>Bold</FontWeight>
+                    </Style>
                   </TextRun>
                 </TextRuns>
                 <Style />
@@ -271,7 +275,7 @@
             <Top>6.21537cm</Top>
             <Left>0cm</Left>
             <Height>0.6cm</Height>
-            <Width>4.24625cm</Width>
+            <Width>4.64313cm</Width>
             <ZIndex>5</ZIndex>
             <Style>
               <Border>
@@ -291,7 +295,9 @@
                 <TextRuns>
                   <TextRun>
                     <Value>Địa chỉ:</Value>
-                    <Style />
+                    <Style>
+                      <FontWeight>Bold</FontWeight>
+                    </Style>
                   </TextRun>
                 </TextRuns>
                 <Style />
@@ -321,7 +327,9 @@
                 <TextRuns>
                   <TextRun>
                     <Value>Mã số thuế:</Value>
-                    <Style />
+                    <Style>
+                      <FontWeight>Bold</FontWeight>
+                    </Style>
                   </TextRun>
                 </TextRuns>
                 <Style />
@@ -351,7 +359,9 @@
                 <TextRuns>
                   <TextRun>
                     <Value>Địa chỉ:</Value>
-                    <Style />
+                    <Style>
+                      <FontWeight>Bold</FontWeight>
+                    </Style>
                   </TextRun>
                 </TextRuns>
                 <Style />
@@ -381,7 +391,9 @@
                 <TextRuns>
                   <TextRun>
                     <Value>Mã số thuế:</Value>
-                    <Style />
+                    <Style>
+                      <FontWeight>Bold</FontWeight>
+                    </Style>
                   </TextRun>
                 </TextRuns>
                 <Style />
@@ -419,9 +431,9 @@
             </Paragraphs>
             <rd:DefaultName>Textbox11</rd:DefaultName>
             <Top>3.99203cm</Top>
-            <Left>4.42264cm</Left>
+            <Left>4.81951cm</Left>
             <Height>0.6cm</Height>
-            <Width>12.31227cm</Width>
+            <Width>11.9154cm</Width>
             <ZIndex>10</ZIndex>
             <Style>
               <Border>
@@ -449,9 +461,9 @@
             </Paragraphs>
             <rd:DefaultName>Textbox11</rd:DefaultName>
             <Top>4.73314cm</Top>
-            <Left>4.42264cm</Left>
+            <Left>4.81951cm</Left>
             <Height>0.6cm</Height>
-            <Width>12.31227cm</Width>
+            <Width>11.9154cm</Width>
             <ZIndex>11</ZIndex>
             <Style>
               <Border>
@@ -479,9 +491,9 @@
             </Paragraphs>
             <rd:DefaultName>Textbox11</rd:DefaultName>
             <Top>5.50953cm</Top>
-            <Left>4.42264cm</Left>
+            <Left>4.81951cm</Left>
             <Height>0.6cm</Height>
-            <Width>12.31227cm</Width>
+            <Width>11.9154cm</Width>
             <ZIndex>12</ZIndex>
             <Style>
               <Border>
@@ -509,9 +521,9 @@
             </Paragraphs>
             <rd:DefaultName>Textbox11</rd:DefaultName>
             <Top>7.69759cm</Top>
-            <Left>4.42264cm</Left>
+            <Left>4.81951cm</Left>
             <Height>0.6cm</Height>
-            <Width>12.31227cm</Width>
+            <Width>11.9154cm</Width>
             <ZIndex>13</ZIndex>
             <Style>
               <Border>
@@ -539,9 +551,9 @@
             </Paragraphs>
             <rd:DefaultName>Textbox11</rd:DefaultName>
             <Top>6.95648cm</Top>
-            <Left>4.42264cm</Left>
+            <Left>4.81951cm</Left>
             <Height>0.6cm</Height>
-            <Width>12.31227cm</Width>
+            <Width>11.9154cm</Width>
             <ZIndex>14</ZIndex>
             <Style>
               <Border>
@@ -569,9 +581,9 @@
             </Paragraphs>
             <rd:DefaultName>Textbox11</rd:DefaultName>
             <Top>6.25065cm</Top>
-            <Left>4.42264cm</Left>
+            <Left>4.81951cm</Left>
             <Height>0.6cm</Height>
-            <Width>12.31227cm</Width>
+            <Width>11.9154cm</Width>
             <ZIndex>15</ZIndex>
             <Style>
               <Border>
@@ -587,19 +599,19 @@
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>1.77006cm</Width>
+                  <Width>1.4261cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>3.74121cm</Width>
+                  <Width>5.19643cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>3.74121cm</Width>
+                  <Width>2.62996cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>3.74121cm</Width>
+                  <Width>3.58246cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>3.74121cm</Width>
+                  <Width>3.89996cm</Width>
                 </TablixColumn>
               </TablixColumns>
               <TablixRows>
@@ -801,7 +813,9 @@
                                   </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style />
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox24</rd:DefaultName>
@@ -838,7 +852,9 @@
                                   </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style />
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>TenSanPham</rd:DefaultName>
@@ -875,7 +891,9 @@
                                   </Style>
                                 </TextRun>
                               </TextRuns>
-                              <Style />
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
                             </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>SoLuongBan</rd:DefaultName>
@@ -901,7 +919,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>=Fields!DonGiaBan.Value</Value>
+                                  <Value>=Format(Fields!DonGiaBan.Value, "#,##0")</Value>
                                   <Style />
                                 </TextRun>
                               </TextRuns>
@@ -966,7 +984,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.6cm</Height>
+                  <Height>1.03656cm</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -977,8 +995,10 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>Tổng cộng tiền thanh toán</Value>
-                                  <Style />
+                                  <Value>Tổng cộng tiền thanh toán:</Value>
+                                  <Style>
+                                    <FontSize>11pt</FontSize>
+                                  </Style>
                                 </TextRun>
                               </TextRuns>
                               <Style>
@@ -1028,6 +1048,43 @@
                                 <TextAlign>Right</TextAlign>
                               </Style>
                             </Paragraph>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Value>(</Value>
+                                  <Style>
+                                    <FontStyle>Normal</FontStyle>
+                                    <FontFamily>Times New Roman</FontFamily>
+                                    <FontWeight>Normal</FontWeight>
+                                    <TextDecoration>None</TextDecoration>
+                                    <Color>#000000</Color>
+                                  </Style>
+                                </TextRun>
+                                <TextRun>
+                                  <Value>=Parameters!pSoTienBangChu.Value</Value>
+                                  <Style>
+                                    <FontStyle>Normal</FontStyle>
+                                    <FontFamily>Times New Roman</FontFamily>
+                                    <FontWeight>Normal</FontWeight>
+                                    <TextDecoration>None</TextDecoration>
+                                    <Color>#000000</Color>
+                                  </Style>
+                                </TextRun>
+                                <TextRun>
+                                  <Value>)</Value>
+                                  <Style>
+                                    <FontStyle>Normal</FontStyle>
+                                    <FontFamily>Times New Roman</FontFamily>
+                                    <FontWeight>Normal</FontWeight>
+                                    <TextDecoration>None</TextDecoration>
+                                    <Color>#000000</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Center</TextAlign>
+                              </Style>
+                            </Paragraph>
                           </Paragraphs>
                           <rd:DefaultName>Textbox37</rd:DefaultName>
                           <Style>
@@ -1072,8 +1129,8 @@
             <DataSetName>HoaDon_ChiTiet</DataSetName>
             <Top>8.9662cm</Top>
             <Left>0cm</Left>
-            <Height>1.8cm</Height>
-            <Width>16.7349cm</Width>
+            <Height>2.23656cm</Height>
+            <Width>16.73491cm</Width>
             <ZIndex>16</ZIndex>
             <Style>
               <Border>
@@ -1113,7 +1170,7 @@
               </Paragraph>
             </Paragraphs>
             <rd:DefaultName>Textbox38</rd:DefaultName>
-            <Top>11.40037cm</Top>
+            <Top>12.11322cm</Top>
             <Left>0cm</Left>
             <Height>1.06302cm</Height>
             <Width>5.96604cm</Width>
@@ -1160,7 +1217,7 @@
               </Paragraph>
             </Paragraphs>
             <rd:DefaultName>Textbox38</rd:DefaultName>
-            <Top>11.40037cm</Top>
+            <Top>12.11322cm</Top>
             <Left>10.2794cm</Left>
             <Height>1.06302cm</Height>
             <Width>6.45551cm</Width>
@@ -1191,7 +1248,7 @@
             </Style>
           </Image>
         </ReportItems>
-        <Height>12.58093cm</Height>
+        <Height>13.17624cm</Height>
         <Style>
           <Border>
             <Style>None</Style>
@@ -1254,6 +1311,12 @@
       <AllowBlank>true</AllowBlank>
       <Prompt>ReportParameter1</Prompt>
     </ReportParameter>
+    <ReportParameter Name="pSoTienBangChu">
+      <DataType>String</DataType>
+      <Nullable>true</Nullable>
+      <AllowBlank>true</AllowBlank>
+      <Prompt>ReportParameter1</Prompt>
+    </ReportParameter>
   </ReportParameters>
   <ReportParametersLayout>
     <GridLayoutDefinition>
@@ -1294,6 +1357,11 @@
           <ColumnIndex>2</ColumnIndex>
           <RowIndex>1</RowIndex>
           <ParameterName>NguoiMua_MaSoThue</ParameterName>
+        </CellDefinition>
+        <CellDefinition>
+          <ColumnIndex>3</ColumnIndex>
+          <RowIndex>1</RowIndex>
+          <ParameterName>pSoTienBangChu</ParameterName>
         </CellDefinition>
       </CellDefinitions>
     </GridLayoutDefinition>
