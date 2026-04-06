@@ -25,7 +25,7 @@ namespace QuanLyCuaHangTapHoa.Forms
             btnLuu.Enabled = giaTri;
             btnHuy.Enabled = giaTri;
 
-            txtMaSanPham.Enabled = giaTri;
+            txtMaSanPham.Enabled = false;
             txtTenSanPham.Enabled = giaTri;
             numSoLuongTon.Enabled = giaTri;
             numDonGiaBan.Enabled = giaTri;
@@ -36,53 +36,62 @@ namespace QuanLyCuaHangTapHoa.Forms
             btnThem.Enabled = !giaTri;
             btnSua.Enabled = !giaTri;
             btnXoa.Enabled = !giaTri;
-            btnTim.Enabled = !giaTri;
             btnNhap.Enabled = !giaTri;
             btnXuat.Enabled = !giaTri;
+            txtTimKiem.Enabled = !giaTri;
         }
 
         private void frmSanPham_Load(object sender, EventArgs e)
         {
             BatTatChucNang(false);
-            dataGridView.AutoGenerateColumns = false;
+            LoadData();
+        }
 
-            List<SanPham> sp = context.SanPham.ToList();
+        private void LoadData()
+        {
+            context.Dispose();
+            context = new QLTHDbContext();
 
-            BindingSource bindingSource = new BindingSource();
-            bindingSource.DataSource = sp;
+            var sp = context.SanPham.ToList();
+            HienThiLenLuoi(sp);
+        }
 
-            // Binding
+        private void HienThiLenLuoi(List<SanPham> ds)
+        {
+            BindingSource bs = new BindingSource();
+            bs.DataSource = ds;
+
             txtMaSanPham.DataBindings.Clear();
-            txtMaSanPham.DataBindings.Add("Text", bindingSource, "MaSanPham", false, DataSourceUpdateMode.Never);
+            txtMaSanPham.DataBindings.Add("Text", bs, "MaSanPham");
 
             txtTenSanPham.DataBindings.Clear();
-            txtTenSanPham.DataBindings.Add("Text", bindingSource, "TenSanPham", false, DataSourceUpdateMode.Never);
+            txtTenSanPham.DataBindings.Add("Text", bs, "TenSanPham");
 
             numSoLuongTon.DataBindings.Clear();
-            numSoLuongTon.DataBindings.Add("Value", bindingSource, "SoLuongTon", false, DataSourceUpdateMode.Never);
+            numSoLuongTon.DataBindings.Add("Value", bs, "SoLuongTon");
 
             numDonGiaBan.DataBindings.Clear();
-            numDonGiaBan.DataBindings.Add("Value", bindingSource, "DonGiaBan", false, DataSourceUpdateMode.Never);
+            numDonGiaBan.DataBindings.Add("Value", bs, "DonGiaBan");
 
             txtMoTa.DataBindings.Clear();
-            txtMoTa.DataBindings.Add("Text", bindingSource, "MoTa", false, DataSourceUpdateMode.Never);
+            txtMoTa.DataBindings.Add("Text", bs, "MoTa");
 
-            // Hình ảnh cho PictureBox
+            // Ảnh
             picHinhAnh.DataBindings.Clear();
-            Binding hinhAnhBinding = new Binding("ImageLocation", bindingSource, "HinhAnh");
-            hinhAnhBinding.Format += (s, ev) =>
+            Binding img = new Binding("ImageLocation", bs, "HinhAnh");
+            img.Format += (s, e) =>
             {
-                if (ev.Value != null)
-                    ev.Value = Path.Combine(imagesFolder, ev.Value.ToString());
+                if (e.Value != null)
+                    e.Value = Path.Combine(imagesFolder, e.Value.ToString());
             };
-            picHinhAnh.DataBindings.Add(hinhAnhBinding);
+            picHinhAnh.DataBindings.Add(img);
 
-            dataGridView.DataSource = bindingSource;
+            dataGridView.DataSource = bs;
 
-            // Ẩn cột ID
             if (dataGridView.Columns["ID"] != null)
                 dataGridView.Columns["ID"].Visible = false;
         }
+
         // ==================== HIỂN THỊ ẢNH NHỎ TRONG DATAGRIDVIEW ====================
         private void dataGridView_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
@@ -107,87 +116,154 @@ namespace QuanLyCuaHangTapHoa.Forms
             BatTatChucNang(true);
 
             txtMaSanPham.Text = MaTuDong.SinhMaSanPham();
+
             txtTenSanPham.Clear();
             txtMoTa.Clear();
             numSoLuongTon.Value = 0;
             numDonGiaBan.Value = 0;
             picHinhAnh.Image = null;
+
+            txtTenSanPham.Focus();
         }
 
         private void btnSua_Click(object sender, EventArgs e)
         {
+            if (dataGridView.CurrentRow == null)
+            {
+                MessageBox.Show("Chọn sản phẩm!");
+                return;
+            }
+
             xuLyThem = false;
             BatTatChucNang(true);
+
             id = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value);
+
         }
 
         private void btnLuu_Click(object sender, EventArgs e)
         {
             if (string.IsNullOrWhiteSpace(txtTenSanPham.Text))
             {
-                MessageBox.Show("Vui lòng nhập tên sản phẩm!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Nhập tên sản phẩm!");
                 return;
             }
-            if (numSoLuongTon.Value <= 0)
-            {
-                MessageBox.Show("Số lượng tồn phải lớn hơn 0!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
+
             if (numDonGiaBan.Value <= 0)
             {
-                MessageBox.Show("Đơn giá phải lớn hơn 0!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Giá phải > 0!");
                 return;
             }
 
-            if (xuLyThem)
+            if (numSoLuongTon.Value < 0)
             {
-                SanPham sp = new SanPham
-                {
-                    MaSanPham = txtMaSanPham.Text,
-                    TenSanPham = txtTenSanPham.Text,
-                    SoLuongTon = (int)numSoLuongTon.Value,
-                    DonGiaBan = (int)numDonGiaBan.Value,
-                    MoTa = txtMoTa.Text,
-                    HinhAnh = picHinhAnh.Image != null ? Path.GetFileName(picHinhAnh.ImageLocation) : null
-                };
-                context.SanPham.Add(sp);
-            }
-            else
-            {
-                SanPham sp = context.SanPham.Find(id);
-                if (sp != null)
-                {
-                    sp.MaSanPham = txtMaSanPham.Text;
-                    sp.TenSanPham = txtTenSanPham.Text;
-                    sp.SoLuongTon = (int)numSoLuongTon.Value;
-                    sp.DonGiaBan = (int)numDonGiaBan.Value;
-                    sp.MoTa = txtMoTa.Text;
-                    if (picHinhAnh.Image != null)
-                        sp.HinhAnh = Path.GetFileName(picHinhAnh.ImageLocation);
-                }
+                MessageBox.Show("Số lượng không hợp lệ!");
+                return;
             }
 
-            context.SaveChanges();
-            frmSanPham_Load(sender, e);
+            string ma = txtMaSanPham.Text.Trim();
+
+            if (xuLyThem && context.SanPham.Any(x => x.MaSanPham == ma))
+            {
+                MessageBox.Show("Trùng mã sản phẩm!");
+                return;
+            }
+
+            try
+            {
+                if (xuLyThem)
+                {
+                    var sp = new SanPham
+                    {
+                        MaSanPham = ma,
+                        TenSanPham = txtTenSanPham.Text,
+                        DonGiaBan = (int)numDonGiaBan.Value,
+                        SoLuongTon = (int)numSoLuongTon.Value,
+                        MoTa = txtMoTa.Text,
+                        HinhAnh = picHinhAnh.Image != null
+                            ? Path.GetFileName(picHinhAnh.ImageLocation)
+                            : null
+                    };
+
+                    context.SanPham.Add(sp);
+                }
+                else
+                {
+                    var sp = context.SanPham.Find(id);
+
+                    if (sp != null)
+                    {
+                        sp.TenSanPham = txtTenSanPham.Text;
+                        sp.DonGiaBan = (int)numDonGiaBan.Value;
+                        sp.SoLuongTon = (int)numSoLuongTon.Value;
+                        sp.MoTa = txtMoTa.Text;
+
+                        if (picHinhAnh.Image != null)
+                            sp.HinhAnh = Path.GetFileName(picHinhAnh.ImageLocation);
+                    }
+                }
+
+                context.SaveChanges();
+
+                MessageBox.Show("Lưu thành công!");
+                BatTatChucNang(false);
+                LoadData();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: " + ex.Message);
+            }
+
         }
 
         private void btnXoa_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("Xác nhận xóa sản phẩm " + txtTenSanPham.Text + "?", "Xóa",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            if (dataGridView.CurrentRow == null)
             {
-                id = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value);
-                SanPham sp = context.SanPham.Find(id);
-                if (sp != null) context.SanPham.Remove(sp);
-
-                context.SaveChanges();
-                frmSanPham_Load(sender, e);
+                MessageBox.Show("Chọn sản phẩm!");
+                return;
             }
+
+            if (MessageBox.Show("Bạn chắc chắn xóa?", "Xác nhận",
+                MessageBoxButtons.YesNo) == DialogResult.No)
+                return;
+
+            try
+            {
+                int id = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value);
+
+                // ❗ check FK
+                bool daBan = context.HoaDon_ChiTiet.Any(x => x.SanPhamID == id);
+                bool daNhap = context.PhieuNhap_ChiTiet.Any(x => x.SanPhamID == id);
+
+                if (daBan || daNhap)
+                {
+                    MessageBox.Show("Không thể xóa! Sản phẩm đã phát sinh giao dịch.");
+                    return;
+                }
+
+                var sp = context.SanPham.Find(id);
+
+                if (sp != null)
+                {
+                    context.SanPham.Remove(sp);
+                    context.SaveChanges();
+                    MessageBox.Show("Đã xóa!");
+                }
+
+                LoadData();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Lỗi: " + ex.Message);
+            }
+
         }
 
         private void btnHuy_Click(object sender, EventArgs e)
         {
-            frmSanPham_Load(sender, e);
+            BatTatChucNang(false);
+            LoadData();
         }
 
         private void btnThoat_Click(object sender, EventArgs e)
@@ -344,7 +420,7 @@ namespace QuanLyCuaHangTapHoa.Forms
                                     MoTa = sheet.Cell(i, 6).GetString()
                                 };
 
-                               context.SanPham.Add(sp);
+                                context.SanPham.Add(sp);
                                 thanhCong++;
                             }
                             catch (Exception exRow)
@@ -356,7 +432,7 @@ namespace QuanLyCuaHangTapHoa.Forms
 
                         context.SaveChanges();
                     }
-                   
+
                     MessageBox.Show(
                         $"Nhập thành công: {thanhCong}\n" +
                         $"Lỗi: {loi}\n\n" +
@@ -373,6 +449,23 @@ namespace QuanLyCuaHangTapHoa.Forms
                     MessageBox.Show("Lỗi file: " + ex.Message);
                 }
             }
+        }
+
+        private void txtTimKiem_TextChanged(object sender, EventArgs e)
+        {
+            string tuKhoa = txtTimKiem.Text.ToLower();
+
+            var ds = context.SanPham
+                .Where(x => x.TenSanPham.ToLower().Contains(tuKhoa)
+                         || x.MaSanPham.ToLower().Contains(tuKhoa))
+                .ToList();
+
+            dataGridView.DataSource = ds;
+        }
+
+        private void btnLamMoi_Click(object sender, EventArgs e)
+        {
+            LoadData();
         }
     }
 }

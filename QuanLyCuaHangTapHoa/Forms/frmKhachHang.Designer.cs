@@ -47,7 +47,6 @@
             label3 = new Label();
             label2 = new Label();
             label1 = new Label();
-            btnTim = new Button();
             groupBox2 = new GroupBox();
             dataGridView = new DataGridView();
             ID = new DataGridViewTextBoxColumn();
@@ -57,6 +56,7 @@
             DiaChi = new DataGridViewTextBoxColumn();
             txtTimKiem = new TextBox();
             label8 = new Label();
+            btnLamMoi = new Button();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
             groupBox2.SuspendLayout();
@@ -252,15 +252,6 @@
             label1.TabIndex = 0;
             label1.Text = "Mã khách hàng:";
             // 
-            // btnTim
-            // 
-            btnTim.Location = new Point(943, 420);
-            btnTim.Name = "btnTim";
-            btnTim.Size = new Size(150, 70);
-            btnTim.TabIndex = 11;
-            btnTim.Text = "Tìm kiếm";
-            btnTim.UseVisualStyleBackColor = true;
-            // 
             // groupBox2
             // 
             groupBox2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
@@ -336,6 +327,7 @@
             txtTimKiem.Name = "txtTimKiem";
             txtTimKiem.Size = new Size(690, 39);
             txtTimKiem.TabIndex = 6;
+            txtTimKiem.TextChanged += txtTimKiem_TextChanged;
             // 
             // label8
             // 
@@ -347,17 +339,27 @@
             label8.TabIndex = 5;
             label8.Text = "Tìm kiếm:";
             // 
+            // btnLamMoi
+            // 
+            btnLamMoi.Location = new Point(1097, 420);
+            btnLamMoi.Name = "btnLamMoi";
+            btnLamMoi.Size = new Size(150, 70);
+            btnLamMoi.TabIndex = 12;
+            btnLamMoi.Text = "Làm mới";
+            btnLamMoi.UseVisualStyleBackColor = true;
+            btnLamMoi.Click += btnLamMoi_Click;
+            // 
             // frmKhachHang
             // 
             AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.DarkSeaGreen;
             ClientSize = new Size(1676, 761);
+            Controls.Add(btnLamMoi);
             Controls.Add(txtTimKiem);
             Controls.Add(groupBox2);
             Controls.Add(label8);
             Controls.Add(groupBox1);
-            Controls.Add(btnTim);
             Name = "frmKhachHang";
             Text = "Khách hàng";
             Load += frmKhachHang_Load;
@@ -379,7 +381,6 @@
         private Label label1;
         private Button btnThoat;
         private Button btnHuy;
-        private Button btnTim;
         private Button btnXoa;
         private Button btnSua;
         private Button btnThem;
@@ -400,5 +401,6 @@
         private TextBox txtTimKiem;
         private Label label8;
         private PictureBox pictureBox3;
+        private Button btnLamMoi;
     }
 }

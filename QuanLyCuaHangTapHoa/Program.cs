@@ -13,7 +13,7 @@ namespace QuanLyCuaHangTapHoa
             Application.SetCompatibleTextRenderingDefault(false);
 
             
-            Application.Run(new frmMain());
+            Application.Run(new frmSanPham());
         }
     }
 }

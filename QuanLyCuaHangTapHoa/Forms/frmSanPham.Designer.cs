@@ -51,7 +51,6 @@
             label3 = new Label();
             label2 = new Label();
             label1 = new Label();
-            btnTim = new Button();
             groupBox2 = new GroupBox();
             dataGridView = new DataGridView();
             ID = new DataGridViewTextBoxColumn();
@@ -62,6 +61,7 @@
             HinhAnh = new DataGridViewImageColumn();
             txtTimKiem = new TextBox();
             label8 = new Label();
+            btnLamMoi = new Button();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)picHinhAnh).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numDonGiaBan).BeginInit();
@@ -290,15 +290,6 @@
             label1.TabIndex = 0;
             label1.Text = "Mã sản phẩm:";
             // 
-            // btnTim
-            // 
-            btnTim.Location = new Point(897, 483);
-            btnTim.Name = "btnTim";
-            btnTim.Size = new Size(150, 70);
-            btnTim.TabIndex = 20;
-            btnTim.Text = "Tìm kiếm";
-            btnTim.UseVisualStyleBackColor = true;
-            // 
             // groupBox2
             // 
             groupBox2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
@@ -388,6 +379,7 @@
             txtTimKiem.Name = "txtTimKiem";
             txtTimKiem.Size = new Size(690, 39);
             txtTimKiem.TabIndex = 28;
+            txtTimKiem.TextChanged += txtTimKiem_TextChanged;
             // 
             // label8
             // 
@@ -398,17 +390,27 @@
             label8.TabIndex = 27;
             label8.Text = "Tìm kiếm:";
             // 
+            // btnLamMoi
+            // 
+            btnLamMoi.Location = new Point(952, 483);
+            btnLamMoi.Name = "btnLamMoi";
+            btnLamMoi.Size = new Size(150, 70);
+            btnLamMoi.TabIndex = 29;
+            btnLamMoi.Text = "Làm mới";
+            btnLamMoi.UseVisualStyleBackColor = true;
+            btnLamMoi.Click += btnLamMoi_Click;
+            // 
             // frmSanPham
             // 
             AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.CadetBlue;
             ClientSize = new Size(1551, 849);
+            Controls.Add(btnLamMoi);
             Controls.Add(txtTimKiem);
             Controls.Add(groupBox2);
             Controls.Add(label8);
             Controls.Add(groupBox1);
-            Controls.Add(btnTim);
             Name = "frmSanPham";
             Text = "Sản phẩm";
             Load += frmSanPham_Load;
@@ -440,7 +442,6 @@
         private Button btnXuat;
         private Button btnNhap;
         private Button btnLuu;
-        private Button btnTim;
         private Button btnThoat;
         private Button btnHuy;
         private Button btnXoa;
@@ -457,5 +458,6 @@
         private DataGridViewImageColumn HinhAnh;
         private TextBox txtTimKiem;
         private Label label8;
+        private Button btnLamMoi;
     }
 }

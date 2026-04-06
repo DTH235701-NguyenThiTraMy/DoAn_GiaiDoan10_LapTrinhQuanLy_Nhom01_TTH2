@@ -1,28 +1,30 @@
 ﻿using BCrypt.Net;
+using ClosedXML.Excel;
+using Microsoft.EntityFrameworkCore;
+using QuanLyCuaHangTapHoa.Data;
 using System;
 using System.Collections.Generic;
-using System.Windows.Forms;
-using QuanLyCuaHangTapHoa.Data;
-using ClosedXML.Excel;
 using System.Data;
+using System.Windows.Forms;
 
 namespace QuanLyCuaHangTapHoa.Forms
 {
     public partial class frmNhanVien : Form
     {
-        QLTHDbContext context = new QLTHDbContext();
-        bool xuLyThem = false;
-        int id;
+        private readonly QLTHDbContext _context;   // Một instance cho toàn form
+        private bool _isAdding = false;
+        private int _currentId;
         public frmNhanVien()
         {
             InitializeComponent();
+            _context = new QLTHDbContext();
         }
         private void BatTatChucNang(bool giaTri)
         {
             btnLuu.Enabled = giaTri;
             btnHuy.Enabled = giaTri;
 
-            txtMaNhanVien.Enabled = giaTri;
+            txtMaNhanVien.Enabled = false;
             txtHoVaTen.Enabled = giaTri;
             txtDienThoai.Enabled = giaTri;
             txtDiaChi.Enabled = giaTri;
@@ -33,49 +35,74 @@ namespace QuanLyCuaHangTapHoa.Forms
             btnThem.Enabled = !giaTri;
             btnSua.Enabled = !giaTri;
             btnXoa.Enabled = !giaTri;
-            btnTim.Enabled = !giaTri;
             btnNhap.Enabled = !giaTri;
             btnXuat.Enabled = !giaTri;
+            txtTimKiem.Enabled = !giaTri;
+
         }
         private void frmNhanVien_Load(object sender, EventArgs e)
         {
             BatTatChucNang(false);
-            dataGridView.AutoGenerateColumns = false;
+            LoadData();
 
-            List<NhanVien> nv = context.NhanVien.ToList();
+        }
 
-            BindingSource bindingSource = new BindingSource();
-            bindingSource.DataSource = nv;
+        private void LoadData()
+        {
+            var danhSach = _context.NhanVien
+                .AsNoTracking()
+                .ToList();
 
-            // Binding
-            txtMaNhanVien.DataBindings.Clear();
+            HienThiLenLuoi(danhSach);
+        }
+
+        private void HienThiLenLuoi(List<NhanVien> danhSach)
+        {
+            var bindingSource = new BindingSource { DataSource = danhSach };
+
+            // Clear tất cả binding trước để tránh lỗi
+            ClearAllBindings();
+
             txtMaNhanVien.DataBindings.Add("Text", bindingSource, "MaNhanVien", false, DataSourceUpdateMode.Never);
-
-            txtHoVaTen.DataBindings.Clear();
             txtHoVaTen.DataBindings.Add("Text", bindingSource, "HoVaTen", false, DataSourceUpdateMode.Never);
-
-            txtDienThoai.DataBindings.Clear();
             txtDienThoai.DataBindings.Add("Text", bindingSource, "DienThoai", false, DataSourceUpdateMode.Never);
-
-            txtDiaChi.DataBindings.Clear();
             txtDiaChi.DataBindings.Add("Text", bindingSource, "DiaChi", false, DataSourceUpdateMode.Never);
-
-            txtTenDangNhap.DataBindings.Clear();
             txtTenDangNhap.DataBindings.Add("Text", bindingSource, "TenDangNhap", false, DataSourceUpdateMode.Never);
 
-            cboQuyenHan.DataBindings.Clear();
-            cboQuyenHan.DataBindings.Add("SelectedIndex", bindingSource, "QuyenHan", false, DataSourceUpdateMode.Never);
+            // Binding quyền hạn (bool → SelectedIndex)
+            var bindingQuyen = new Binding("SelectedIndex", bindingSource, "QuyenHan", true, DataSourceUpdateMode.Never);
+            bindingQuyen.Format += (s, args) => args.Value = (bool)args.Value ? 0 : 1;
+            cboQuyenHan.DataBindings.Add(bindingQuyen);
 
             dataGridView.DataSource = bindingSource;
 
-            // Ẩn cột ID
-            if (dataGridView.Columns["ID"] != null)
-                dataGridView.Columns["ID"].Visible = false;
+            // Ẩn cột nhạy cảm
+            if (dataGridView.Columns["ID"] != null) dataGridView.Columns["ID"].Visible = false;
+            if (dataGridView.Columns["MatKhau"] != null) dataGridView.Columns["MatKhau"].Visible = false;
+
+            dataGridView.Refresh();
+        }
+        private void ClearAllBindings()
+        {
+            txtMaNhanVien.DataBindings.Clear();
+            txtHoVaTen.DataBindings.Clear();
+            txtDienThoai.DataBindings.Clear();
+            txtDiaChi.DataBindings.Clear();
+            txtTenDangNhap.DataBindings.Clear();
+            cboQuyenHan.DataBindings.Clear();
+        }
+
+        private bool IsPhoneNumber(string number)
+        {
+            return !string.IsNullOrWhiteSpace(number)
+                && number.Length == 10
+                && number.StartsWith("0")
+                && number.All(char.IsDigit);
         }
 
         private void btnThem_Click(object sender, EventArgs e)
         {
-            xuLyThem = true;
+            _isAdding = true;
             BatTatChucNang(true);
 
             txtMaNhanVien.Text = MaTuDong.SinhMaNhanVien();
@@ -84,93 +111,174 @@ namespace QuanLyCuaHangTapHoa.Forms
             txtDiaChi.Clear();
             txtTenDangNhap.Clear();
             txtMatKhau.Clear();
-            cboQuyenHan.SelectedIndex = -1;
+            cboQuyenHan.SelectedIndex = 1;
+
+            txtHoVaTen.Focus();
         }
 
         private void btnSua_Click(object sender, EventArgs e)
         {
-            xuLyThem = false;
+            if (dataGridView.CurrentRow == null)
+            {
+                MessageBox.Show("Vui lòng chọn nhân viên cần sửa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            _isAdding = false;
             BatTatChucNang(true);
-            id = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value);
+
+            _currentId = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value);
+
+            txtTenDangNhap.Enabled = false;           // Không cho sửa username
+            txtMatKhau.Clear();
+            txtMatKhau.PlaceholderText = "Để trống nếu giữ nguyên mật khẩu cũ";
+
         }
 
         private void btnLuu_Click(object sender, EventArgs e)
         {
+            // 1. Validate cơ bản
             if (string.IsNullOrWhiteSpace(txtHoVaTen.Text))
             {
-                MessageBox.Show("Vui lòng nhập họ và tên nhân viên?", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Vui lòng nhập họ và tên!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtHoVaTen.Focus();
                 return;
             }
+
             if (string.IsNullOrWhiteSpace(txtTenDangNhap.Text))
             {
-                MessageBox.Show("Vui lòng nhập tên đăng nhập?", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                return;
-            }
-            if (cboQuyenHan.SelectedIndex == -1)
-            {
-                MessageBox.Show("Vui lòng chọn quyền hạn?", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Vui lòng nhập tên đăng nhập!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtTenDangNhap.Focus();
                 return;
             }
 
-            if (xuLyThem)
+            if (string.IsNullOrWhiteSpace(txtDienThoai.Text))
             {
-                if (string.IsNullOrWhiteSpace(txtMatKhau.Text))
+                MessageBox.Show("Vui lòng nhập số điện thoại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtDienThoai.Focus();
+                return;
+            }
+
+            string sdt = txtDienThoai.Text.Trim();
+            if (!IsPhoneNumber(sdt))
+            {
+                MessageBox.Show("Số điện thoại không hợp lệ! (Phải 10 số, bắt đầu bằng 0)", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtDienThoai.Focus();
+                return;
+            }
+
+            // 2. Kiểm tra trùng số điện thoại
+            bool trungSDT = _isAdding
+                ? _context.NhanVien.Any(x => x.DienThoai == sdt)
+                : _context.NhanVien.Any(x => x.DienThoai == sdt && x.ID != _currentId);
+
+            if (trungSDT)
+            {
+                MessageBox.Show("Số điện thoại này đã được sử dụng bởi nhân viên khác!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            string tenDN = txtTenDangNhap.Text.Trim();
+
+            try
+            {
+                if (_isAdding)
                 {
-                    MessageBox.Show("Vui lòng nhập mật khẩu?", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                    return;
+                    if (_context.NhanVien.Any(x => x.TenDangNhap == tenDN))
+                    {
+                        MessageBox.Show("Tên đăng nhập này đã tồn tại!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        return;
+                    }
+
+                    if (string.IsNullOrWhiteSpace(txtMatKhau.Text))
+                    {
+                        MessageBox.Show("Nhân viên mới bắt buộc phải có mật khẩu!", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                        txtMatKhau.Focus();
+                        return;
+                    }
+
+                    var nvMoi = new NhanVien
+                    {
+                        MaNhanVien = txtMaNhanVien.Text,
+                        HoVaTen = txtHoVaTen.Text.Trim(),
+                        DienThoai = sdt,
+                        DiaChi = txtDiaChi.Text.Trim(),
+                        TenDangNhap = tenDN,
+                        MatKhau = BCrypt.Net.BCrypt.HashPassword(txtMatKhau.Text, 12), // work factor 12
+                        QuyenHan = cboQuyenHan.SelectedIndex == 0
+                    };
+
+                    _context.NhanVien.Add(nvMoi);
                 }
-
-                NhanVien nv = new NhanVien();
-                nv.MaNhanVien = txtMaNhanVien.Text;           // sau sẽ tự động sinh
-                nv.HoVaTen = txtHoVaTen.Text;
-                nv.DienThoai = txtDienThoai.Text;
-                nv.DiaChi = txtDiaChi.Text;
-                nv.TenDangNhap = txtTenDangNhap.Text;
-                nv.MatKhau = BCrypt.Net.BCrypt.HashPassword(txtMatKhau.Text);
-                nv.QuyenHan = cboQuyenHan.SelectedIndex == 0;
-
-                context.NhanVien.Add(nv);
-            }
-            else
-            {
-                NhanVien nv = context.NhanVien.Find(id);
-                if (nv != null)
+                else
                 {
-                    nv.MaNhanVien = txtMaNhanVien.Text;
-                    nv.HoVaTen = txtHoVaTen.Text;
-                    nv.DienThoai = txtDienThoai.Text;
-                    nv.DiaChi = txtDiaChi.Text;
-                    nv.TenDangNhap = txtTenDangNhap.Text;
+                    var nv = _context.NhanVien.Find(_currentId);
+                    if (nv == null) return;
+
+                    nv.HoVaTen = txtHoVaTen.Text.Trim();
+                    nv.DienThoai = sdt;
+                    nv.DiaChi = txtDiaChi.Text.Trim();
                     nv.QuyenHan = cboQuyenHan.SelectedIndex == 0;
 
                     if (!string.IsNullOrWhiteSpace(txtMatKhau.Text))
-                        nv.MatKhau = BCrypt.Net.BCrypt.HashPassword(txtMatKhau.Text);
-
-                    context.NhanVien.Update(nv);
+                    {
+                        nv.MatKhau = BCrypt.Net.BCrypt.HashPassword(txtMatKhau.Text, 12);
+                    }
                 }
+
+                _context.SaveChanges();
+
+                MessageBox.Show("Lưu dữ liệu thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                BatTatChucNang(false);
+                LoadData();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi khi lưu: {ex.Message}", "Lỗi hệ thống", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-            context.SaveChanges();
-            frmNhanVien_Load(sender, e);
         }
 
         private void btnXoa_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("Xác nhận xóa nhân viên " + txtHoVaTen.Text + "?", "Xóa",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            if (dataGridView.CurrentRow == null)
             {
-                id = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value);
-                NhanVien nv = context.NhanVien.Find(id);
-                if (nv != null) context.NhanVien.Remove(nv);
+                MessageBox.Show("Vui lòng chọn nhân viên cần xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
 
-                context.SaveChanges();
-                frmNhanVien_Load(sender, e);
+            string ten = txtHoVaTen.Text;
+
+            if (MessageBox.Show($"Bạn có chắc muốn xóa nhân viên '{ten}' không?\nHành động này không thể hoàn tác.",
+                "Xác nhận xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+                return;
+
+            try
+            {
+                _currentId = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value);
+                var nv = _context.NhanVien.Find(_currentId);
+
+                if (nv != null)
+                {
+                    _context.NhanVien.Remove(nv);
+                    _context.SaveChanges();
+
+                    MessageBox.Show("Xóa nhân viên thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LoadData();
+                }
+            }
+            catch (Exception)
+            {
+                MessageBox.Show("Không thể xóa nhân viên này vì họ đã có giao dịch (hóa đơn/phiếu nhập) trong hệ thống!",
+                    "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void btnHuy_Click(object sender, EventArgs e)
         {
-            frmNhanVien_Load(sender, e);
+            BatTatChucNang(false);
+            LoadData();
         }
 
         private void btnThoat_Click(object sender, EventArgs e)
@@ -198,7 +306,7 @@ namespace QuanLyCuaHangTapHoa.Forms
                     table.Columns.Add("MatKhau");
                     table.Columns.Add("QuyenHan");
 
-                    var ds = context.NhanVien.ToList();
+                    var ds = _context.NhanVien.ToList();
 
                     foreach (var nv in ds)
                     {
@@ -259,7 +367,7 @@ namespace QuanLyCuaHangTapHoa.Forms
                                 if (string.IsNullOrEmpty(maNV))
                                     continue;
 
-                                if (context.NhanVien.Any(x => x.MaNhanVien == maNV))
+                                if (_context.NhanVien.Any(x => x.MaNhanVien == maNV))
                                 {
                                     loi++;
                                     chiTietLoi += $"Dòng {i}: Trùng mã NV\n";
@@ -269,7 +377,7 @@ namespace QuanLyCuaHangTapHoa.Forms
                                 string tenDN = sheet.Cell(i, 5).GetString();
 
                                 // ❗ tránh trùng tài khoản
-                                if (context.NhanVien.Any(x => x.TenDangNhap == tenDN))
+                                if (_context.NhanVien.Any(x => x.TenDangNhap == tenDN))
                                 {
                                     loi++;
                                     chiTietLoi += $"Dòng {i}: Trùng tên đăng nhập\n";
@@ -291,7 +399,7 @@ namespace QuanLyCuaHangTapHoa.Forms
                                     QuyenHan = quyenHan
                                 };
 
-                                context.NhanVien.Add(nv);
+                                _context.NhanVien.Add(nv);
                                 thanhCong++;
                             }
                             catch (Exception exRow)
@@ -301,7 +409,7 @@ namespace QuanLyCuaHangTapHoa.Forms
                             }
                         }
 
-                        context.SaveChanges();
+                        _context.SaveChanges();
                     }
 
                     MessageBox.Show(
@@ -318,9 +426,30 @@ namespace QuanLyCuaHangTapHoa.Forms
             }
         }
 
-        private void btnTim_Click(object sender, EventArgs e)
+        private void txtTimKiem_TextChanged(object sender, EventArgs e)
         {
+            string keyword = txtTimKiem.Text.ToLower().Trim();
 
+            var ketQua = _context.NhanVien
+                .AsNoTracking()
+                .Where(x => x.HoVaTen.ToLower().Contains(keyword) ||
+                            x.MaNhanVien.ToLower().Contains(keyword) ||
+                            x.DienThoai.Contains(keyword) ||
+                            x.TenDangNhap.ToLower().Contains(keyword))
+                .ToList();
+
+            HienThiLenLuoi(ketQua);
+        }
+
+        private void btnLamMoi_Click(object sender, EventArgs e)
+        {            
+            LoadData();
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            _context?.Dispose();
+            base.OnFormClosing(e);
         }
     }
 }

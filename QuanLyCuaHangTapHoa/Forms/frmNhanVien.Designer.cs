@@ -53,18 +53,18 @@
             label3 = new Label();
             label2 = new Label();
             label1 = new Label();
-            btnTim = new Button();
             groupBox2 = new GroupBox();
             dataGridView = new DataGridView();
-            ID = new DataGridViewTextBoxColumn();
-            MaNhanVien = new DataGridViewTextBoxColumn();
-            HoVaTen = new DataGridViewTextBoxColumn();
-            DienThoai = new DataGridViewTextBoxColumn();
-            DiaChi = new DataGridViewTextBoxColumn();
-            TenDangNhap = new DataGridViewTextBoxColumn();
-            QuyenHan = new DataGridViewTextBoxColumn();
             label8 = new Label();
             txtTimKiem = new TextBox();
+            btnLamMoi = new Button();
+            QuyenHan = new DataGridViewTextBoxColumn();
+            TenDangNhap = new DataGridViewTextBoxColumn();
+            DiaChi = new DataGridViewTextBoxColumn();
+            DienThoai = new DataGridViewTextBoxColumn();
+            HoVaTen = new DataGridViewTextBoxColumn();
+            MaNhanVien = new DataGridViewTextBoxColumn();
+            ID = new DataGridViewTextBoxColumn();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).BeginInit();
             groupBox2.SuspendLayout();
@@ -317,15 +317,6 @@
             label1.TabIndex = 0;
             label1.Text = "Mã khách nhân viên:";
             // 
-            // btnTim
-            // 
-            btnTim.Location = new Point(959, 498);
-            btnTim.Name = "btnTim";
-            btnTim.Size = new Size(150, 70);
-            btnTim.TabIndex = 11;
-            btnTim.Text = "Tìm kiếm";
-            btnTim.UseVisualStyleBackColor = true;
-            // 
             // groupBox2
             // 
             groupBox2.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
@@ -354,62 +345,6 @@
             dataGridView.Size = new Size(1650, 255);
             dataGridView.TabIndex = 0;
             // 
-            // ID
-            // 
-            ID.HeaderText = "ID";
-            ID.MinimumWidth = 10;
-            ID.Name = "ID";
-            ID.ReadOnly = true;
-            ID.Visible = false;
-            // 
-            // MaNhanVien
-            // 
-            MaNhanVien.DataPropertyName = "MaNhanVien";
-            MaNhanVien.HeaderText = "Mã nhân viên";
-            MaNhanVien.MinimumWidth = 10;
-            MaNhanVien.Name = "MaNhanVien";
-            MaNhanVien.ReadOnly = true;
-            // 
-            // HoVaTen
-            // 
-            HoVaTen.DataPropertyName = "HoVaTen";
-            HoVaTen.HeaderText = "Họ và tên";
-            HoVaTen.MinimumWidth = 10;
-            HoVaTen.Name = "HoVaTen";
-            HoVaTen.ReadOnly = true;
-            // 
-            // DienThoai
-            // 
-            DienThoai.DataPropertyName = "DienThoai";
-            DienThoai.HeaderText = "Điện thoại";
-            DienThoai.MinimumWidth = 10;
-            DienThoai.Name = "DienThoai";
-            DienThoai.ReadOnly = true;
-            // 
-            // DiaChi
-            // 
-            DiaChi.DataPropertyName = "DiaChi";
-            DiaChi.HeaderText = "Địa chỉ";
-            DiaChi.MinimumWidth = 10;
-            DiaChi.Name = "DiaChi";
-            DiaChi.ReadOnly = true;
-            // 
-            // TenDangNhap
-            // 
-            TenDangNhap.DataPropertyName = "TenDangNhap";
-            TenDangNhap.HeaderText = "Tên đăng nhập";
-            TenDangNhap.MinimumWidth = 10;
-            TenDangNhap.Name = "TenDangNhap";
-            TenDangNhap.ReadOnly = true;
-            // 
-            // QuyenHan
-            // 
-            QuyenHan.DataPropertyName = "QuyenHan";
-            QuyenHan.HeaderText = "Quyền hạn";
-            QuyenHan.MinimumWidth = 10;
-            QuyenHan.Name = "QuyenHan";
-            QuyenHan.ReadOnly = true;
-            // 
             // label8
             // 
             label8.AutoSize = true;
@@ -425,6 +360,73 @@
             txtTimKiem.Name = "txtTimKiem";
             txtTimKiem.Size = new Size(690, 39);
             txtTimKiem.TabIndex = 4;
+            txtTimKiem.TextChanged += txtTimKiem_TextChanged;
+            // 
+            // btnLamMoi
+            // 
+            btnLamMoi.Location = new Point(1143, 497);
+            btnLamMoi.Name = "btnLamMoi";
+            btnLamMoi.Size = new Size(150, 70);
+            btnLamMoi.TabIndex = 5;
+            btnLamMoi.Text = "Làm mới";
+            btnLamMoi.UseVisualStyleBackColor = true;
+            btnLamMoi.Click += btnLamMoi_Click;
+            // 
+            // QuyenHan
+            // 
+            QuyenHan.DataPropertyName = "QuyenHan";
+            QuyenHan.HeaderText = "Quyền hạn";
+            QuyenHan.MinimumWidth = 10;
+            QuyenHan.Name = "QuyenHan";
+            QuyenHan.ReadOnly = true;
+            // 
+            // TenDangNhap
+            // 
+            TenDangNhap.DataPropertyName = "TenDangNhap";
+            TenDangNhap.HeaderText = "Tên đăng nhập";
+            TenDangNhap.MinimumWidth = 10;
+            TenDangNhap.Name = "TenDangNhap";
+            TenDangNhap.ReadOnly = true;
+            // 
+            // DiaChi
+            // 
+            DiaChi.DataPropertyName = "DiaChi";
+            DiaChi.HeaderText = "Địa chỉ";
+            DiaChi.MinimumWidth = 10;
+            DiaChi.Name = "DiaChi";
+            DiaChi.ReadOnly = true;
+            // 
+            // DienThoai
+            // 
+            DienThoai.DataPropertyName = "DienThoai";
+            DienThoai.HeaderText = "Điện thoại";
+            DienThoai.MinimumWidth = 10;
+            DienThoai.Name = "DienThoai";
+            DienThoai.ReadOnly = true;
+            // 
+            // HoVaTen
+            // 
+            HoVaTen.DataPropertyName = "HoVaTen";
+            HoVaTen.HeaderText = "Họ và tên";
+            HoVaTen.MinimumWidth = 10;
+            HoVaTen.Name = "HoVaTen";
+            HoVaTen.ReadOnly = true;
+            // 
+            // MaNhanVien
+            // 
+            MaNhanVien.DataPropertyName = "MaNhanVien";
+            MaNhanVien.HeaderText = "Mã nhân viên";
+            MaNhanVien.MinimumWidth = 10;
+            MaNhanVien.Name = "MaNhanVien";
+            MaNhanVien.ReadOnly = true;
+            // 
+            // ID
+            // 
+            ID.DataPropertyName = "ID";
+            ID.HeaderText = "ID";
+            ID.MinimumWidth = 10;
+            ID.Name = "ID";
+            ID.ReadOnly = true;
             // 
             // frmNhanVien
             // 
@@ -432,14 +434,15 @@
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.LightBlue;
             ClientSize = new Size(1680, 900);
+            Controls.Add(btnLamMoi);
             Controls.Add(txtTimKiem);
             Controls.Add(label8);
             Controls.Add(groupBox2);
             Controls.Add(groupBox1);
-            Controls.Add(btnTim);
             Name = "frmNhanVien";
             Text = "Nhân viên";
             Load += frmNhanVien_Load;
+            TextChanged += txtTimKiem_TextChanged;
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             ((System.ComponentModel.ISupportInitialize)pictureBox3).EndInit();
@@ -455,7 +458,6 @@
         private Button btnXuat;
         private Button btnNhap;
         private Button btnLuu;
-        private Button btnTim;
         private Button btnThoat;
         private Button btnHuy;
         private Button btnXoa;
@@ -477,6 +479,10 @@
         private Label label6;
         private GroupBox groupBox2;
         private DataGridView dataGridView;
+        private PictureBox pictureBox3;
+        private Label label8;
+        private TextBox txtTimKiem;
+        private Button btnLamMoi;
         private DataGridViewTextBoxColumn ID;
         private DataGridViewTextBoxColumn MaNhanVien;
         private DataGridViewTextBoxColumn HoVaTen;
@@ -484,8 +490,5 @@
         private DataGridViewTextBoxColumn DiaChi;
         private DataGridViewTextBoxColumn TenDangNhap;
         private DataGridViewTextBoxColumn QuyenHan;
-        private PictureBox pictureBox3;
-        private Label label8;
-        private TextBox txtTimKiem;
     }
 }

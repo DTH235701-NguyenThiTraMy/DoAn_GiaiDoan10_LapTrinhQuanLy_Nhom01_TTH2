@@ -23,23 +23,29 @@ namespace QuanLyCuaHangTapHoa.Forms
             btnLuu.Enabled = giaTri;
             btnHuy.Enabled = giaTri;
 
-            txtMaKhachHang.Enabled = giaTri;   // tạm thời cho sửa
+            txtMaKhachHang.Enabled = false;
             txtHoVaTen.Enabled = giaTri;
             txtDienThoai.Enabled = giaTri;
             txtDiaChi.Enabled = giaTri;
 
             btnThem.Enabled = !giaTri;
             btnSua.Enabled = !giaTri;
-            btnXoa.Enabled = !giaTri;
-            btnTim.Enabled = !giaTri;
+            btnXoa.Enabled = !giaTri;            
             btnNhap.Enabled = !giaTri;
             btnXuat.Enabled = !giaTri;
+            txtTimKiem.Enabled = !giaTri;
         }
         // ==================== TẢI FORM ====================
         private void frmKhachHang_Load(object sender, EventArgs e)
         {
             BatTatChucNang(false);
+            LoadData();
+        }
 
+        private void LoadData()
+        {
+            // Reset context để lấy dữ liệu mới nhất nếu có thay đổi
+            context = new QLTHDbContext();
             List<KhachHang> kh = context.KhachHang.ToList();
 
             BindingSource bindingSource = new BindingSource();
@@ -65,6 +71,7 @@ namespace QuanLyCuaHangTapHoa.Forms
                 dataGridView.Columns["ID"].Visible = false;
         }
 
+        // ==================== NÚT THÊM ====================
         private void btnThem_Click(object sender, EventArgs e)
         {
             xuLyThem = true;
@@ -76,75 +83,150 @@ namespace QuanLyCuaHangTapHoa.Forms
             txtDiaChi.Clear();
         }
 
+        // ==================== NÚT SỬA ====================
         private void btnSua_Click(object sender, EventArgs e)
         {
-            xuLyThem = false;
-            BatTatChucNang(true);
-            id = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value);
-        }
-
-        private void btnXoa_Click(object sender, EventArgs e)
-        {
-            if (MessageBox.Show("Xác nhận xóa khách hàng " + txtHoVaTen.Text + "?", "Xóa",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            if (dataGridView.CurrentRow == null)
             {
-                id = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value);
-                KhachHang kh = context.KhachHang.Find(id);
-
-                if (kh != null)
-                    context.KhachHang.Remove(kh);
-
-                context.SaveChanges();
-                frmKhachHang_Load(sender, e);
-            }
-        }
-
-        private void btnLuu_Click(object sender, EventArgs e)
-        {
-            if (string.IsNullOrWhiteSpace(txtHoVaTen.Text))
-            {
-                MessageBox.Show("Vui lòng nhập họ và tên khách hàng?", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Vui lòng chọn một khách hàng để sửa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (xuLyThem)
-            {
-                KhachHang kh = new KhachHang();
-                kh.MaKhachHang = txtMaKhachHang.Text;   // tạm thời (sau mình sẽ tự động sinh)
-                kh.HoVaTen = txtHoVaTen.Text;
-                kh.DienThoai = txtDienThoai.Text;
-                kh.DiaChi = txtDiaChi.Text;
+            xuLyThem = false;
+            BatTatChucNang(true);
+            id = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value);
+            txtHoVaTen.Focus();
+        }
 
-                context.KhachHang.Add(kh);
+        // ==================== NÚT XÓA ====================
+        private void btnXoa_Click(object sender, EventArgs e)
+        {
+            if (dataGridView.CurrentRow == null)
+            {
+                MessageBox.Show("Vui lòng chọn một khách hàng để xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
             }
-            else
-            {
-                KhachHang kh = context.KhachHang.Find(id);
-                if (kh != null)
-                {
-                    kh.MaKhachHang = txtMaKhachHang.Text;
-                    kh.HoVaTen = txtHoVaTen.Text;
-                    kh.DienThoai = txtDienThoai.Text;
-                    kh.DiaChi = txtDiaChi.Text;
 
-                    context.KhachHang.Update(kh);
+            if (MessageBox.Show($"Bạn có chắc chắn muốn xóa khách hàng '{txtHoVaTen.Text}' không?", "Xác nhận xóa",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
+            {
+                try
+                {
+                    id = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value);
+                    KhachHang kh = context.KhachHang.Find(id);
+
+                    if (kh != null)
+                    {
+                        context.KhachHang.Remove(kh);
+                        context.SaveChanges();
+                        MessageBox.Show("Xóa khách hàng thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        LoadData();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // Lỗi này thường xảy ra nếu Khách hàng đã có Hóa Đơn (bị dính khóa ngoại)
+                    MessageBox.Show("Không thể xóa khách hàng này vì họ đã phát sinh giao dịch (Hóa đơn) trong hệ thống!", "Lỗi hệ thống", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
-
-            context.SaveChanges();
-            frmKhachHang_Load(sender, e);
         }
 
+        // ==================== NÚT LƯU ====================
+        private void btnLuu_Click(object sender, EventArgs e)
+        {
+            string hoTen = txtHoVaTen.Text.Trim();
+            string sdt = txtDienThoai.Text.Trim();
+            string diaChi = txtDiaChi.Text.Trim();
+
+            // 1. Ràng buộc Tên
+            if (string.IsNullOrEmpty(hoTen))
+            {
+                MessageBox.Show("Vui lòng nhập họ và tên khách hàng!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtHoVaTen.Focus();
+                return;
+            }
+
+            if (string.IsNullOrEmpty(sdt))
+            {
+                MessageBox.Show("Vui lòng nhập số điện thoại khách hàng!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtDienThoai.Focus();
+                return;
+            }
+
+            // 2. Ràng buộc SĐT (Độ dài, ký tự số)
+            if (string.IsNullOrEmpty(sdt) || sdt.Length != 10 || !sdt.All(char.IsDigit))
+            {
+                MessageBox.Show("Số điện thoại không hợp lệ! Vui lòng nhập đúng 10 chữ số.", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtDienThoai.Focus();
+                return;
+            }
+
+            // 3. Ràng buộc SĐT Duy Nhất
+            bool isDuplicatePhone;
+            if (xuLyThem)
+                isDuplicatePhone = context.KhachHang.Any(x => x.DienThoai == sdt);
+            else
+                isDuplicatePhone = context.KhachHang.Any(x => x.DienThoai == sdt && x.ID != id); // Cho phép giữ nguyên SĐT cũ của chính người đó
+
+            if (isDuplicatePhone)
+            {
+                MessageBox.Show("Số điện thoại này đã được đăng ký cho một khách hàng khác!", "Lỗi trùng lặp", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                txtDienThoai.Focus();
+                return;
+            }
+
+            try
+            {
+                if (xuLyThem)
+                {
+                    KhachHang kh = new KhachHang
+                    {
+                        MaKhachHang = txtMaKhachHang.Text,
+                        HoVaTen = hoTen,
+                        DienThoai = sdt,
+                        DiaChi = diaChi
+                    };
+                    context.KhachHang.Add(kh);
+                    MessageBox.Show("Thêm mới khách hàng thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    KhachHang kh = context.KhachHang.Find(id);
+                    if (kh != null)
+                    {
+                        kh.HoVaTen = hoTen;
+                        kh.DienThoai = sdt;
+                        kh.DiaChi = diaChi;
+                        context.KhachHang.Update(kh);
+                        MessageBox.Show("Cập nhật thông tin thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }
+
+                context.SaveChanges();
+                BatTatChucNang(false);
+                LoadData();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Có lỗi xảy ra trong quá trình lưu: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // ==================== NÚT HỦY ====================
         private void btnHuy_Click(object sender, EventArgs e)
         {
-            frmKhachHang_Load(sender, e);
+            BatTatChucNang(false);
+            LoadData();
         }
 
+        // ==================== NÚT THOÁT ====================
         private void btnThoat_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
+
+        // ==================== XUẤT EXCEL ====================
         private void btnXuat_Click(object sender, EventArgs e)
         {
             SaveFileDialog save = new SaveFileDialog();
@@ -193,6 +275,7 @@ namespace QuanLyCuaHangTapHoa.Forms
             }
         }
 
+        // ==================== NHẬP EXCEL ====================
         private void btnNhap_Click(object sender, EventArgs e)
         {
             OpenFileDialog open = new OpenFileDialog();
@@ -211,14 +294,21 @@ namespace QuanLyCuaHangTapHoa.Forms
                         var sheet = wb.Worksheet(1);
                         int rowCount = sheet.LastRowUsed().RowNumber();
 
-                        for (int i = 2; i <= rowCount; i++)
+                        for (int i = 2; i <= rowCount; i++) // Dòng 1 là tiêu đề
                         {
                             try
                             {
                                 string maKH = sheet.Cell(i, 1).GetString().Trim();
+                                string hoTen = sheet.Cell(i, 2).GetString().Trim();
+                                string sdt = sheet.Cell(i, 3).GetString().Trim();
+                                string diaChi = sheet.Cell(i, 4).GetString().Trim();
 
-                                if (string.IsNullOrEmpty(maKH))
+                                if (string.IsNullOrEmpty(maKH) || string.IsNullOrEmpty(hoTen))
+                                {
+                                    loi++;
+                                    chiTietLoi += $"Dòng {i}: Mã KH hoặc Tên bị trống\n";
                                     continue;
+                                }
 
                                 if (context.KhachHang.Any(x => x.MaKhachHang == maKH))
                                 {
@@ -226,19 +316,30 @@ namespace QuanLyCuaHangTapHoa.Forms
                                     chiTietLoi += $"Dòng {i}: Trùng mã KH\n";
                                     continue;
                                 }
+
+                                // Bổ sung kiểm tra SĐT từ file Excel
+                                if (string.IsNullOrEmpty(sdt) || sdt.Length != 10 || !sdt.All(char.IsDigit))
+                                {
+                                    loi++;
+                                    chiTietLoi += $"Dòng {i}: SĐT không hợp lệ (Phải là 10 chữ số)\n";
+                                    continue;
+                                }
+
+                                if (context.KhachHang.Any(x => x.DienThoai == sdt))
+                                {
+                                    loi++;
+                                    chiTietLoi += $"Dòng {i}: SĐT đã tồn tại trong hệ thống\n";
+                                    continue;
+                                }
+
                                 var kh = new KhachHang
                                 {
                                     MaKhachHang = maKH,
-                                    HoVaTen = sheet.Cell(i, 2).GetString(),
-                                    DienThoai = sheet.Cell(i, 3).GetString(),
-                                    DiaChi = sheet.Cell(i, 4).GetString()
+                                    HoVaTen = hoTen,
+                                    DienThoai = sdt,
+                                    DiaChi = diaChi
                                 };
-                                if (kh.DienThoai.Length < 10 || kh.DienThoai.Length > 10)
-                                {
-                                    loi++;
-                                    chiTietLoi += $"Dòng {i}: SĐT không hợp lệ\n";
-                                    continue;
-                                }
+
                                 context.KhachHang.Add(kh);
                                 thanhCong++;
                             }
@@ -248,22 +349,66 @@ namespace QuanLyCuaHangTapHoa.Forms
                                 chiTietLoi += $"Dòng {i}: {exRow.Message}\n";
                             }
                         }
-
                         context.SaveChanges();
                     }
 
-                    MessageBox.Show(
-                        $"Nhập thành công: {thanhCong}\nLỗi: {loi}\n\n{chiTietLoi}",
-                        "Kết quả import"
-                    );
+                    // Tách thông báo thành 2 trường hợp để nhìn gọn gàng hơn
+                    if (loi == 0)
+                    {
+                        MessageBox.Show($"Đã nhập thành công {thanhCong} khách hàng!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                    else
+                    {
+                        MessageBox.Show($"Nhập thành công: {thanhCong}\nLỗi: {loi}\n\nChi tiết lỗi:\n{chiTietLoi}", "Kết quả Import", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    }
 
-                    frmKhachHang_Load(sender, e);
+                    LoadData();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("Lỗi file: " + ex.Message);
+                    MessageBox.Show("Lỗi đọc file Excel: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
+        }
+
+        private void txtTimKiem_TextChanged(object sender, EventArgs e)
+        {
+            string tuKhoa = txtTimKiem.Text.Trim().ToLower();
+
+            var ketQua = context.KhachHang
+                .Where(k => k.HoVaTen.ToLower().Contains(tuKhoa) ||
+                            k.DienThoai.Contains(tuKhoa) ||
+                            k.MaKhachHang.ToLower().Contains(tuKhoa))
+                .ToList();
+
+            // Cập nhật lại lưới ngay lập tức
+            CapNhatGiaoDienTimKiem(ketQua);
+        }
+
+        private void CapNhatGiaoDienTimKiem(List<KhachHang> danhSachLoc)
+        {
+            BindingSource bindingSource = new BindingSource();
+            bindingSource.DataSource = danhSachLoc;
+
+            // Phải xóa Binding cũ để tránh lỗi xung đột dữ liệu
+            txtMaKhachHang.DataBindings.Clear();
+            txtHoVaTen.DataBindings.Clear();
+            txtDienThoai.DataBindings.Clear();
+            txtDiaChi.DataBindings.Clear();
+
+            // Gán Binding mới theo danh sách đã lọc
+            txtMaKhachHang.DataBindings.Add("Text", bindingSource, "MaKhachHang", false, DataSourceUpdateMode.Never);
+            txtHoVaTen.DataBindings.Add("Text", bindingSource, "HoVaTen", false, DataSourceUpdateMode.Never);
+            txtDienThoai.DataBindings.Add("Text", bindingSource, "DienThoai", false, DataSourceUpdateMode.Never);
+            txtDiaChi.DataBindings.Add("Text", bindingSource, "DiaChi", false, DataSourceUpdateMode.Never);
+
+            dataGridView.DataSource = bindingSource;
+        }
+
+        private void btnLamMoi_Click(object sender, EventArgs e)
+        {
+            BatTatChucNang(false);
+            LoadData();
         }
     }
 }
