@@ -42,6 +42,9 @@
             label1 = new Label();
             tableLayoutPanel1 = new TableLayoutPanel();
             btnThoat = new Button();
+            label2 = new Label();
+            txtTimKiem = new TextBox();
+            btnLamMoi = new Button();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView).BeginInit();
             tableLayoutPanel1.SuspendLayout();
@@ -51,7 +54,7 @@
             // 
             groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             groupBox1.Controls.Add(dataGridView);
-            groupBox1.Location = new Point(12, 179);
+            groupBox1.Location = new Point(9, 226);
             groupBox1.Name = "groupBox1";
             groupBox1.Size = new Size(1216, 326);
             groupBox1.TabIndex = 1;
@@ -160,7 +163,7 @@
             btnXuat.Name = "btnXuat";
             btnXuat.Size = new Size(4, 70);
             btnXuat.TabIndex = 27;
-            btnXuat.Text = "Xuất";
+            btnXuat.Text = "Xuất Excel";
             btnXuat.UseVisualStyleBackColor = false;
             btnXuat.Click += btnXuat_Click;
             // 
@@ -198,7 +201,7 @@
             // 
             // btnThoat
             // 
-            btnThoat.Location = new Point(1103, 515);
+            btnThoat.Location = new Point(1106, 110);
             btnThoat.Margin = new Padding(60, 10, 60, 10);
             btnThoat.Name = "btnThoat";
             btnThoat.Size = new Size(122, 70);
@@ -207,12 +210,42 @@
             btnThoat.UseVisualStyleBackColor = true;
             btnThoat.Visible = false;
             // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new Point(49, 136);
+            label2.Name = "label2";
+            label2.Size = new Size(118, 32);
+            label2.TabIndex = 30;
+            label2.Text = "Tìm kiếm:";
+            // 
+            // txtTimKiem
+            // 
+            txtTimKiem.Location = new Point(173, 134);
+            txtTimKiem.Name = "txtTimKiem";
+            txtTimKiem.Size = new Size(616, 39);
+            txtTimKiem.TabIndex = 31;
+            txtTimKiem.TextChanged += txtTimKiem_TextChanged;
+            // 
+            // btnLamMoi
+            // 
+            btnLamMoi.Location = new Point(871, 134);
+            btnLamMoi.Name = "btnLamMoi";
+            btnLamMoi.Size = new Size(150, 46);
+            btnLamMoi.TabIndex = 1;
+            btnLamMoi.Text = "Làm mới";
+            btnLamMoi.UseVisualStyleBackColor = true;
+            btnLamMoi.Click += btnLamMoi_Click;
+            // 
             // frmPhieuNhap
             // 
             AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.PeachPuff;
             ClientSize = new Size(1240, 698);
+            Controls.Add(btnLamMoi);
+            Controls.Add(txtTimKiem);
+            Controls.Add(label2);
             Controls.Add(btnThoat);
             Controls.Add(tableLayoutPanel1);
             Controls.Add(label1);
@@ -225,6 +258,7 @@
             ((System.ComponentModel.ISupportInitialize)dataGridView).EndInit();
             tableLayoutPanel1.ResumeLayout(false);
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -242,5 +276,8 @@
         private Label label1;
         private TableLayoutPanel tableLayoutPanel1;
         private Button btnThoat;
+        private Label label2;
+        private TextBox txtTimKiem;
+        private Button btnLamMoi;
     }
 }

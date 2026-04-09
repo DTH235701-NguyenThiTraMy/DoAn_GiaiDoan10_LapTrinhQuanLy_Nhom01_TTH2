@@ -45,10 +45,18 @@
           <DataField>ThanhTien</DataField>
           <rd:TypeName>System.Decimal</rd:TypeName>
         </Field>
+        <Field Name="MaSanPham">
+          <DataField>MaSanPham</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="MaHoaDon">
+          <DataField>MaHoaDon</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
       </Fields>
       <rd:DataSetInfo>
         <rd:DataSetName>QLTHDataSet</rd:DataSetName>
-        <rd:SchemaPath>D:\Nam3\HKII\LTQL\Đồ án\DoAnGD8\QuanLyCuaHangTapHoa\Reports\QLTHDataSet.xsd</rd:SchemaPath>
+        <rd:SchemaPath>D:\Nam3\HKII\LTQL\NopBai\Đồ án\DoAn_GiaiDoan10\QuanLyCuaHangTapHoa\Reports\QLTHDataSet.xsd</rd:SchemaPath>
         <rd:TableName>HoaDon_ChiTiet</rd:TableName>
         <rd:TableAdapterFillMethod />
         <rd:TableAdapterGetDataMethod />
@@ -197,6 +205,14 @@
             <Paragraphs>
               <Paragraph>
                 <TextRuns>
+                  <TextRun>
+                    <Value>=Fields!MaHoaDon.Value</Value>
+                    <Style />
+                  </TextRun>
+                  <TextRun>
+                    <Value>,  </Value>
+                    <Style />
+                  </TextRun>
                   <TextRun>
                     <Value>=Parameters!NgayLap.Value</Value>
                     <Style />
@@ -599,16 +615,16 @@
             <TablixBody>
               <TablixColumns>
                 <TablixColumn>
-                  <Width>1.4261cm</Width>
+                  <Width>1.54516cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>5.19643cm</Width>
+                  <Width>5.64622cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>2.62996cm</Width>
+                  <Width>2.27277cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>3.58246cm</Width>
+                  <Width>3.37079cm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>3.89996cm</Width>
@@ -846,6 +862,25 @@
                                     <FontStyle>Normal</FontStyle>
                                     <FontFamily>Times New Roman</FontFamily>
                                     <FontSize>12pt</FontSize>
+                                    <FontWeight>Normal</FontWeight>
+                                    <TextDecoration>None</TextDecoration>
+                                    <Color>#000000</Color>
+                                  </Style>
+                                </TextRun>
+                              </TextRuns>
+                              <Style>
+                                <TextAlign>Left</TextAlign>
+                              </Style>
+                            </Paragraph>
+                            <Paragraph>
+                              <TextRuns>
+                                <TextRun>
+                                  <Label>MaSP</Label>
+                                  <Value>=Fields!MaSanPham.Value</Value>
+                                  <Style>
+                                    <FontStyle>Normal</FontStyle>
+                                    <FontFamily>Times New Roman</FontFamily>
+                                    <FontSize>9pt</FontSize>
                                     <FontWeight>Normal</FontWeight>
                                     <TextDecoration>None</TextDecoration>
                                     <Color>#000000</Color>
@@ -1255,7 +1290,7 @@
           </Border>
         </Style>
       </Body>
-      <Width>16.73491cm</Width>
+      <Width>17.11824cm</Width>
       <Page>
         <PageHeight>29.7cm</PageHeight>
         <PageWidth>21cm</PageWidth>

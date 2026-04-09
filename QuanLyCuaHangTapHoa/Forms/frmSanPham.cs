@@ -38,6 +38,7 @@ namespace QuanLyCuaHangTapHoa.Forms
             dataGridView.AutoGenerateColumns = false;
             dataGridView.DataSource = bs;        // Gán 1 lần duy nhất
             LoadDataToGrid();
+            RefreshBindings();
         }
 
         private void LoadDataToGrid(string keyword = "")
@@ -55,7 +56,7 @@ namespace QuanLyCuaHangTapHoa.Forms
             var ds = query.ToList();
             bs.DataSource = ds;
 
-            RefreshBindings();
+            //RefreshBindings();
         }
 
         private void RefreshBindings()
@@ -302,6 +303,7 @@ namespace QuanLyCuaHangTapHoa.Forms
         private void btnLamMoi_Click(object sender, EventArgs e)
         {
             LoadDataToGrid();
+            txtTimKiem.Clear();
         }
 
         private void btnDoiAnh_Click(object sender, EventArgs e)
@@ -337,7 +339,6 @@ namespace QuanLyCuaHangTapHoa.Forms
         private void txtTimKiem_TextChanged(object sender, EventArgs e)
         {
             LoadDataToGrid(txtTimKiem.Text);
-            txtTimKiem.Clear();
         }
 
         // ====================== EXPORT / IMPORT (giữ nguyên, bạn có thể tinh chỉnh sau) ======================

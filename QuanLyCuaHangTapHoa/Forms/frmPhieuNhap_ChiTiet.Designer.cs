@@ -38,6 +38,7 @@
             label2 = new Label();
             label1 = new Label();
             groupBox2 = new GroupBox();
+            btnCong = new Button();
             dataGridView = new DataGridView();
             SanPhamID = new DataGridViewTextBoxColumn();
             TenSanPham = new DataGridViewTextBoxColumn();
@@ -45,7 +46,7 @@
             DonGia = new DataGridViewTextBoxColumn();
             ThanhTien = new DataGridViewTextBoxColumn();
             btnXoa = new Button();
-            btnThemSP = new Button();
+            btnXacNhanNhap = new Button();
             numDonGia = new NumericUpDown();
             numSoLuong = new NumericUpDown();
             cboSanPham = new ComboBox();
@@ -109,7 +110,6 @@
             txtMaPhieuNhap.ReadOnly = true;
             txtMaPhieuNhap.Size = new Size(268, 39);
             txtMaPhieuNhap.TabIndex = 4;
-            txtMaPhieuNhap.TextChanged += txtMaPhieuNhap_TextChanged;
             // 
             // label4
             // 
@@ -150,9 +150,10 @@
             // groupBox2
             // 
             groupBox2.BackColor = SystemColors.Control;
+            groupBox2.Controls.Add(btnCong);
             groupBox2.Controls.Add(dataGridView);
             groupBox2.Controls.Add(btnXoa);
-            groupBox2.Controls.Add(btnThemSP);
+            groupBox2.Controls.Add(btnXacNhanNhap);
             groupBox2.Controls.Add(numDonGia);
             groupBox2.Controls.Add(numSoLuong);
             groupBox2.Controls.Add(cboSanPham);
@@ -165,6 +166,16 @@
             groupBox2.TabIndex = 1;
             groupBox2.TabStop = false;
             groupBox2.Text = "Thông tin chi tiết phiếu nhập";
+            // 
+            // btnCong
+            // 
+            btnCong.Location = new Point(275, 97);
+            btnCong.Name = "btnCong";
+            btnCong.Size = new Size(50, 50);
+            btnCong.TabIndex = 25;
+            btnCong.Text = "+";
+            btnCong.UseVisualStyleBackColor = true;
+            btnCong.Click += btnCong_Click;
             // 
             // dataGridView
             // 
@@ -233,15 +244,15 @@
             btnXoa.UseVisualStyleBackColor = true;
             btnXoa.Click += btnXoa_Click;
             // 
-            // btnThemSP
+            // btnXacNhanNhap
             // 
-            btnThemSP.Location = new Point(875, 26);
-            btnThemSP.Name = "btnThemSP";
-            btnThemSP.Size = new Size(202, 56);
-            btnThemSP.TabIndex = 22;
-            btnThemSP.Text = "Xác nhận nhập";
-            btnThemSP.UseVisualStyleBackColor = true;
-            btnThemSP.Click += btnThemSP_Click;
+            btnXacNhanNhap.Location = new Point(875, 26);
+            btnXacNhanNhap.Name = "btnXacNhanNhap";
+            btnXacNhanNhap.Size = new Size(202, 56);
+            btnXacNhanNhap.TabIndex = 22;
+            btnXacNhanNhap.Text = "Xác nhận nhập";
+            btnXacNhanNhap.UseVisualStyleBackColor = true;
+            btnXacNhanNhap.Click += btnXacNhanNhap_Click;
             // 
             // numDonGia
             // 
@@ -263,11 +274,14 @@
             // 
             // cboSanPham
             // 
+            cboSanPham.AutoCompleteMode = AutoCompleteMode.Suggest;
+            cboSanPham.AutoCompleteSource = AutoCompleteSource.ListItems;
             cboSanPham.FormattingEnabled = true;
             cboSanPham.Location = new Point(27, 100);
             cboSanPham.Name = "cboSanPham";
             cboSanPham.Size = new Size(242, 40);
             cboSanPham.TabIndex = 9;
+            cboSanPham.SelectedIndexChanged += cboSanPham_SelectedIndexChanged;
             // 
             // label6
             // 
@@ -298,9 +312,9 @@
             // 
             // btnThoat
             // 
-            btnThoat.Location = new Point(736, 802);
+            btnThoat.Location = new Point(712, 792);
             btnThoat.Name = "btnThoat";
-            btnThoat.Size = new Size(185, 46);
+            btnThoat.Size = new Size(180, 70);
             btnThoat.TabIndex = 26;
             btnThoat.Text = "Thoát";
             btnThoat.UseVisualStyleBackColor = true;
@@ -309,9 +323,9 @@
             // btnLuu
             // 
             btnLuu.ForeColor = Color.Blue;
-            btnLuu.Location = new Point(167, 802);
+            btnLuu.Location = new Point(280, 792);
             btnLuu.Name = "btnLuu";
-            btnLuu.Size = new Size(198, 46);
+            btnLuu.Size = new Size(180, 70);
             btnLuu.TabIndex = 25;
             btnLuu.Text = "Lưu";
             btnLuu.UseVisualStyleBackColor = true;
@@ -330,7 +344,7 @@
             // 
             AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
-            BackColor = SystemColors.Control;
+            BackColor = Color.PapayaWhip;
             ClientSize = new Size(1134, 874);
             Controls.Add(lblTongTien);
             Controls.Add(btnThoat);
@@ -371,7 +385,7 @@
         private Label label5;
         private Label label7;
         private Button btnXoa;
-        private Button btnThemSP;
+        private Button btnXacNhanNhap;
         private DataGridView dataGridView;
         private DataGridViewTextBoxColumn SanPhamID;
         private DataGridViewTextBoxColumn TenSanPham;
@@ -381,5 +395,6 @@
         private Button btnThoat;
         private Button btnLuu;
         private Label lblTongTien;
+        private Button btnCong;
     }
 }

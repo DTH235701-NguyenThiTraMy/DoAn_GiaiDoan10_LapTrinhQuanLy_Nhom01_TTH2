@@ -50,7 +50,9 @@ namespace QuanLyCuaHangTapHoa.Reports
                                 r.SanPham.TenSanPham,
                                 r.SoLuongBan,
                                 r.DonGiaBan,
-                                r.SoLuongBan * r.DonGiaBan
+                                r.SoLuongBan * r.DonGiaBan,
+                                r.SanPham.MaSanPham,
+                                r.HoaDon.MaHoaDon
                             );
                         }
 
