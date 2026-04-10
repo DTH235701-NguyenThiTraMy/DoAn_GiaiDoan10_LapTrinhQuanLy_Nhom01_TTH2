@@ -442,7 +442,8 @@ namespace QuanLyCuaHangTapHoa.Forms
         }
 
         private void btnLamMoi_Click(object sender, EventArgs e)
-        {            
+        {
+            txtTimKiem.Clear();
             LoadData();
         }
 

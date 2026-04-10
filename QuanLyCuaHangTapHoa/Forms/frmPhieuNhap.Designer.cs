@@ -52,11 +52,11 @@
             // 
             // groupBox1
             // 
-            groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             groupBox1.Controls.Add(dataGridView);
             groupBox1.Location = new Point(9, 226);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(1216, 326);
+            groupBox1.Size = new Size(1216, 356);
             groupBox1.TabIndex = 1;
             groupBox1.TabStop = false;
             groupBox1.Text = "Danh sách phiếu nhập";
@@ -73,7 +73,7 @@
             dataGridView.Name = "dataGridView";
             dataGridView.ReadOnly = true;
             dataGridView.RowHeadersWidth = 82;
-            dataGridView.Size = new Size(1210, 288);
+            dataGridView.Size = new Size(1210, 318);
             dataGridView.TabIndex = 0;
             // 
             // ID
@@ -120,10 +120,10 @@
             // 
             btnXoa.Dock = DockStyle.Fill;
             btnXoa.ForeColor = Color.Red;
-            btnXoa.Location = new Point(754, 10);
+            btnXoa.Location = new Point(770, 10);
             btnXoa.Margin = new Padding(150, 10, 150, 10);
             btnXoa.Name = "btnXoa";
-            btnXoa.Size = new Size(2, 70);
+            btnXoa.Size = new Size(10, 70);
             btnXoa.TabIndex = 16;
             btnXoa.Text = "Xóa";
             btnXoa.UseVisualStyleBackColor = true;
@@ -132,10 +132,10 @@
             // btnSua
             // 
             btnSua.Dock = DockStyle.Fill;
-            btnSua.Location = new Point(452, 10);
+            btnSua.Location = new Point(460, 10);
             btnSua.Margin = new Padding(150, 10, 150, 10);
             btnSua.Name = "btnSua";
-            btnSua.Size = new Size(2, 70);
+            btnSua.Size = new Size(10, 70);
             btnSua.TabIndex = 15;
             btnSua.Text = "Sửa";
             btnSua.UseVisualStyleBackColor = true;
@@ -147,7 +147,7 @@
             btnThem.Location = new Point(150, 10);
             btnThem.Margin = new Padding(150, 10, 150, 10);
             btnThem.Name = "btnThem";
-            btnThem.Size = new Size(2, 70);
+            btnThem.Size = new Size(10, 70);
             btnThem.TabIndex = 14;
             btnThem.Text = "Thêm";
             btnThem.UseVisualStyleBackColor = true;
@@ -158,10 +158,10 @@
             btnXuat.BackColor = Color.LightGreen;
             btnXuat.Dock = DockStyle.Fill;
             btnXuat.ForeColor = Color.Green;
-            btnXuat.Location = new Point(1056, 10);
+            btnXuat.Location = new Point(1080, 10);
             btnXuat.Margin = new Padding(150, 10, 150, 10);
             btnXuat.Name = "btnXuat";
-            btnXuat.Size = new Size(4, 70);
+            btnXuat.Size = new Size(10, 70);
             btnXuat.TabIndex = 27;
             btnXuat.Text = "Xuất Excel";
             btnXuat.UseVisualStyleBackColor = false;
@@ -182,7 +182,6 @@
             // 
             // tableLayoutPanel1
             // 
-            tableLayoutPanel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             tableLayoutPanel1.ColumnCount = 4;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
@@ -192,11 +191,12 @@
             tableLayoutPanel1.Controls.Add(btnSua, 1, 0);
             tableLayoutPanel1.Controls.Add(btnXuat, 3, 0);
             tableLayoutPanel1.Controls.Add(btnThem, 0, 0);
-            tableLayoutPanel1.Location = new Point(15, 588);
+            tableLayoutPanel1.Dock = DockStyle.Bottom;
+            tableLayoutPanel1.Location = new Point(0, 608);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 1;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.Size = new Size(1210, 90);
+            tableLayoutPanel1.Size = new Size(1240, 90);
             tableLayoutPanel1.TabIndex = 28;
             // 
             // btnThoat

@@ -26,7 +26,7 @@ namespace QuanLyCuaHangTapHoa.Forms
         {
             MoForm(new frmTrangChu());
             ChuaDangNhap();
-            DangNhap();            
+            DangNhap();
         }
 
         // ================= MỞ FORM =================
@@ -137,6 +137,7 @@ namespace QuanLyCuaHangTapHoa.Forms
 
 
             lblTrangThai.Text = "Chưa đăng nhập";
+            lblLienKet.Visible = true;
         }
 
         void QuyenQuanLy()
@@ -152,6 +153,7 @@ namespace QuanLyCuaHangTapHoa.Forms
             mnuBaoCaoThongKe.Enabled = true;
 
             lblTrangThai.Text = "Quản lý: " + hoVaTenNhanVien;
+            lblLienKet.Visible = true;
         }
 
         void QuyenNhanVien()
@@ -167,22 +169,39 @@ namespace QuanLyCuaHangTapHoa.Forms
             mnuPhieuNhap.Enabled = true;
 
             lblTrangThai.Text = "Nhân viên: " + hoVaTenNhanVien;
+            lblLienKet.Visible = true;
         }
 
         private void mnuDangXuat_Click(object sender, EventArgs e)
         {
-            if (MessageBox.Show("Bạn có chắc muốn đăng xuất?", "Xác nhận", 
-                MessageBoxButtons.YesNo, 
-                MessageBoxIcon.Question
-            ) == DialogResult.No)
+            // 1. Hỏi xác nhận
+            if (MessageBox.Show("Bạn có chắc muốn đăng xuất tài khoản này?", "Xác nhận",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question) == DialogResult.No)
+            {
                 return;
+            }
 
+            // 2. Đóng tất cả các form con đang mở (sản phẩm, hóa đơn...)
             foreach (Form f in this.MdiChildren)
+            {
                 f.Close();
+            }
 
+            // 3. Xóa bộ nhớ phiên đăng nhập cũ
             currentUserId = 0;
             hoVaTenNhanVien = "";
+
+            // 4. Khóa chức năng trên Menu
             ChuaDangNhap();
+
+            // 5. Trả giao diện về màn hình nền (Trang chủ)
+            MoForm(new frmTrangChu());
+
+            // 6. Hiển thị thông báo như bạn mong muốn
+            MessageBox.Show("Đã đăng xuất thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+            
         }
 
         private void mnuThoat_Click(object sender, EventArgs e)

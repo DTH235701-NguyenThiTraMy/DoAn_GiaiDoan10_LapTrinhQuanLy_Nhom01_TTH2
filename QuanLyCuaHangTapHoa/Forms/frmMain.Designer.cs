@@ -52,11 +52,13 @@
             trợGiúpToolStripMenuItem = new ToolStripMenuItem();
             mnuHuongDanSuDung = new ToolStripMenuItem();
             mnuThongTinPhanMem = new ToolStripMenuItem();
-            statusStrip1 = new StatusStrip();
+            sidebarTimer = new System.Windows.Forms.Timer(components);
             lblTrangThai = new ToolStripStatusLabel();
             toolStripStatusLabel1 = new ToolStripStatusLabel();
             lblLienKet = new ToolStripStatusLabel();
-            sidebarTimer = new System.Windows.Forms.Timer(components);
+            statusStrip1 = new StatusStrip();
+            toolStripStatusLabel2 = new ToolStripStatusLabel();
+            toolStripStatusLabel3 = new ToolStripStatusLabel();
             menuStrip1.SuspendLayout();
             statusStrip1.SuspendLayout();
             SuspendLayout();
@@ -68,7 +70,7 @@
             menuStrip1.Items.AddRange(new ToolStripItem[] { mnuTrangChu, mnuHeThong, mnuQuanLy, mnuPhieuNhap, mnuBaoCaoThongKe, trợGiúpToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
-            menuStrip1.Size = new Size(1384, 44);
+            menuStrip1.Size = new Size(852, 44);
             menuStrip1.TabIndex = 1;
             menuStrip1.Text = "menuStrip1";
             // 
@@ -218,17 +220,6 @@
             mnuThongTinPhanMem.Text = "&Thông tin phần mềm";
             mnuThongTinPhanMem.Click += mnuThongTinPhanMem_Click;
             // 
-            // statusStrip1
-            // 
-            statusStrip1.BackColor = SystemColors.Control;
-            statusStrip1.ImageScalingSize = new Size(32, 32);
-            statusStrip1.Items.AddRange(new ToolStripItem[] { lblTrangThai, toolStripStatusLabel1, lblLienKet });
-            statusStrip1.Location = new Point(0, 823);
-            statusStrip1.Name = "statusStrip1";
-            statusStrip1.Size = new Size(1384, 42);
-            statusStrip1.TabIndex = 2;
-            statusStrip1.Text = "statusStrip1";
-            // 
             // lblTrangThai
             // 
             lblTrangThai.Name = "lblTrangThai";
@@ -238,22 +229,45 @@
             // toolStripStatusLabel1
             // 
             toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            toolStripStatusLabel1.Size = new Size(977, 32);
-            toolStripStatusLabel1.Spring = true;
+            toolStripStatusLabel1.Size = new Size(0, 32);
             // 
             // lblLienKet
             // 
             lblLienKet.IsLink = true;
             lblLienKet.Name = "lblLienKet";
-            lblLienKet.Size = new Size(139, 32);
+            lblLienKet.Size = new Size(627, 32);
+            lblLienKet.Spring = true;
             lblLienKet.Text = "© 2026 FIT ";
+            lblLienKet.TextAlign = ContentAlignment.MiddleRight;
             lblLienKet.Click += lblLienKet_Click;
+            // 
+            // statusStrip1
+            // 
+            statusStrip1.BackColor = SystemColors.Control;
+            statusStrip1.ImageScalingSize = new Size(32, 32);
+            statusStrip1.Items.AddRange(new ToolStripItem[] { lblTrangThai, toolStripStatusLabel1, lblLienKet, toolStripStatusLabel2, toolStripStatusLabel3 });
+            statusStrip1.Location = new Point(0, 401);
+            statusStrip1.Name = "statusStrip1";
+            statusStrip1.Size = new Size(852, 42);
+            statusStrip1.TabIndex = 2;
+            statusStrip1.Text = "statusStrip1";
+            // 
+            // toolStripStatusLabel2
+            // 
+            toolStripStatusLabel2.Name = "toolStripStatusLabel2";
+            toolStripStatusLabel2.Size = new Size(0, 32);
+            // 
+            // toolStripStatusLabel3
+            // 
+            toolStripStatusLabel3.Name = "toolStripStatusLabel3";
+            toolStripStatusLabel3.Size = new Size(19, 32);
+            toolStripStatusLabel3.Text = ".";
             // 
             // frmMain
             // 
             AutoScaleDimensions = new SizeF(13F, 32F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1384, 865);
+            ClientSize = new Size(852, 443);
             Controls.Add(statusStrip1);
             Controls.Add(menuStrip1);
             IsMdiContainer = true;
@@ -279,7 +293,6 @@
         private ToolStripMenuItem mnuDangXuat;
         private ToolStripMenuItem mnuDoiMatKhau;
         private ToolStripMenuItem mnuQuanLy;
-        private StatusStrip statusStrip1;
         private ToolStripSeparator toolStripMenuItem1;
         private ToolStripMenuItem mnuThoat;
         private ToolStripMenuItem mnuKhachHang;
@@ -295,10 +308,13 @@
         private ToolStripMenuItem trợGiúpToolStripMenuItem;
         private ToolStripMenuItem mnuHuongDanSuDung;
         private ToolStripMenuItem mnuThongTinPhanMem;
+        private System.Windows.Forms.Timer sidebarTimer;
+        private ToolStripMenuItem mnuTrangChu;
         private ToolStripStatusLabel lblTrangThai;
         private ToolStripStatusLabel toolStripStatusLabel1;
         private ToolStripStatusLabel lblLienKet;
-        private System.Windows.Forms.Timer sidebarTimer;
-        private ToolStripMenuItem mnuTrangChu;
+        private StatusStrip statusStrip1;
+        private ToolStripStatusLabel toolStripStatusLabel2;
+        private ToolStripStatusLabel toolStripStatusLabel3;
     }
 }

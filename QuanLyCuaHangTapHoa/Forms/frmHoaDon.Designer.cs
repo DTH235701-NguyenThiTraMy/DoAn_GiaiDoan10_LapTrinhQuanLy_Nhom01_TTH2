@@ -28,9 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
-            DataGridViewCellStyle dataGridViewCellStyle4 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle5 = new DataGridViewCellStyle();
-            DataGridViewCellStyle dataGridViewCellStyle6 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+            DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
             groupBox1 = new GroupBox();
             dataGridView = new DataGridView();
             ID = new DataGridViewTextBoxColumn();
@@ -58,11 +58,11 @@
             // 
             // groupBox1
             // 
-            groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            groupBox1.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             groupBox1.Controls.Add(dataGridView);
             groupBox1.Location = new Point(12, 184);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(1438, 423);
+            groupBox1.Size = new Size(1438, 551);
             groupBox1.TabIndex = 0;
             groupBox1.TabStop = false;
             groupBox1.Text = "Danh sách hóa đơn";
@@ -80,7 +80,7 @@
             dataGridView.Name = "dataGridView";
             dataGridView.ReadOnly = true;
             dataGridView.RowHeadersWidth = 82;
-            dataGridView.Size = new Size(1432, 385);
+            dataGridView.Size = new Size(1432, 513);
             dataGridView.TabIndex = 0;
             dataGridView.CellContentClick += dataGridView_CellContentClick;
             // 
@@ -120,9 +120,9 @@
             // NgayLap
             // 
             NgayLap.DataPropertyName = "NgayLap";
-            dataGridViewCellStyle4.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            dataGridViewCellStyle4.Format = "dd/MM/yyyy";
-            NgayLap.DefaultCellStyle = dataGridViewCellStyle4;
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.Format = "dd/MM/yyyy";
+            NgayLap.DefaultCellStyle = dataGridViewCellStyle1;
             NgayLap.HeaderText = "Ngày lập";
             NgayLap.MinimumWidth = 10;
             NgayLap.Name = "NgayLap";
@@ -131,9 +131,9 @@
             // TongTienHoaDon
             // 
             TongTienHoaDon.DataPropertyName = "TongTienHoaDon";
-            dataGridViewCellStyle5.Alignment = DataGridViewContentAlignment.MiddleRight;
-            dataGridViewCellStyle5.ForeColor = Color.FromArgb(0, 0, 192);
-            TongTienHoaDon.DefaultCellStyle = dataGridViewCellStyle5;
+            dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dataGridViewCellStyle2.ForeColor = Color.FromArgb(0, 0, 192);
+            TongTienHoaDon.DefaultCellStyle = dataGridViewCellStyle2;
             TongTienHoaDon.HeaderText = "Tổng tiền";
             TongTienHoaDon.MinimumWidth = 10;
             TongTienHoaDon.Name = "TongTienHoaDon";
@@ -142,8 +142,8 @@
             // XemChiTiet
             // 
             XemChiTiet.DataPropertyName = "XemChiTiet";
-            dataGridViewCellStyle6.Alignment = DataGridViewContentAlignment.MiddleCenter;
-            XemChiTiet.DefaultCellStyle = dataGridViewCellStyle6;
+            dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            XemChiTiet.DefaultCellStyle = dataGridViewCellStyle3;
             XemChiTiet.HeaderText = "Chi tiết";
             XemChiTiet.MinimumWidth = 10;
             XemChiTiet.Name = "XemChiTiet";
@@ -156,7 +156,7 @@
             btnLapHoaDon.Location = new Point(60, 10);
             btnLapHoaDon.Margin = new Padding(60, 10, 60, 10);
             btnLapHoaDon.Name = "btnLapHoaDon";
-            btnLapHoaDon.Size = new Size(167, 70);
+            btnLapHoaDon.Size = new Size(176, 70);
             btnLapHoaDon.TabIndex = 1;
             btnLapHoaDon.Text = "Lập hóa đơn";
             btnLapHoaDon.UseVisualStyleBackColor = true;
@@ -165,10 +165,10 @@
             // btnInHoaDon
             // 
             btnInHoaDon.Dock = DockStyle.Fill;
-            btnInHoaDon.Location = new Point(347, 10);
+            btnInHoaDon.Location = new Point(356, 10);
             btnInHoaDon.Margin = new Padding(60, 10, 60, 10);
             btnInHoaDon.Name = "btnInHoaDon";
-            btnInHoaDon.Size = new Size(167, 70);
+            btnInHoaDon.Size = new Size(176, 70);
             btnInHoaDon.TabIndex = 2;
             btnInHoaDon.Text = "In hóa đơn";
             btnInHoaDon.UseVisualStyleBackColor = true;
@@ -177,10 +177,10 @@
             // btnSua
             // 
             btnSua.Dock = DockStyle.Fill;
-            btnSua.Location = new Point(634, 10);
+            btnSua.Location = new Point(652, 10);
             btnSua.Margin = new Padding(60, 10, 60, 10);
             btnSua.Name = "btnSua";
-            btnSua.Size = new Size(167, 70);
+            btnSua.Size = new Size(176, 70);
             btnSua.TabIndex = 3;
             btnSua.Text = "Sửa";
             btnSua.UseVisualStyleBackColor = true;
@@ -190,10 +190,10 @@
             // 
             btnXoa.Dock = DockStyle.Fill;
             btnXoa.ForeColor = Color.Red;
-            btnXoa.Location = new Point(921, 10);
+            btnXoa.Location = new Point(948, 10);
             btnXoa.Margin = new Padding(60, 10, 60, 10);
             btnXoa.Name = "btnXoa";
-            btnXoa.Size = new Size(167, 70);
+            btnXoa.Size = new Size(176, 70);
             btnXoa.TabIndex = 20;
             btnXoa.Text = "Xóa";
             btnXoa.UseVisualStyleBackColor = true;
@@ -215,10 +215,10 @@
             btnXuat.BackColor = Color.LightGreen;
             btnXuat.Dock = DockStyle.Fill;
             btnXuat.ForeColor = Color.Green;
-            btnXuat.Location = new Point(1208, 10);
+            btnXuat.Location = new Point(1244, 10);
             btnXuat.Margin = new Padding(60, 10, 60, 10);
             btnXuat.Name = "btnXuat";
-            btnXuat.Size = new Size(167, 70);
+            btnXuat.Size = new Size(177, 70);
             btnXuat.TabIndex = 26;
             btnXuat.Text = "Xuất";
             btnXuat.UseVisualStyleBackColor = false;
@@ -243,7 +243,6 @@
             // 
             // tableLayoutPanel1
             // 
-            tableLayoutPanel1.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             tableLayoutPanel1.ColumnCount = 5;
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
             tableLayoutPanel1.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 20F));
@@ -255,11 +254,12 @@
             tableLayoutPanel1.Controls.Add(btnXoa, 3, 0);
             tableLayoutPanel1.Controls.Add(btnSua, 2, 0);
             tableLayoutPanel1.Controls.Add(btnLapHoaDon, 0, 0);
-            tableLayoutPanel1.Location = new Point(15, 648);
+            tableLayoutPanel1.Dock = DockStyle.Bottom;
+            tableLayoutPanel1.Location = new Point(0, 757);
             tableLayoutPanel1.Name = "tableLayoutPanel1";
             tableLayoutPanel1.RowCount = 1;
             tableLayoutPanel1.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
-            tableLayoutPanel1.Size = new Size(1435, 90);
+            tableLayoutPanel1.Size = new Size(1481, 90);
             tableLayoutPanel1.TabIndex = 29;
             // 
             // btnLamMoi
