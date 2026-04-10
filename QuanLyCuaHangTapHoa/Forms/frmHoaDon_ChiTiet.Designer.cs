@@ -320,9 +320,9 @@
             lblTongTien.AutoSize = true;
             lblTongTien.Location = new Point(959, 735);
             lblTongTien.Name = "lblTongTien";
-            lblTongTien.Size = new Size(78, 32);
+            lblTongTien.Size = new Size(19, 32);
             lblTongTien.TabIndex = 25;
-            lblTongTien.Text = "label7";
+            lblTongTien.Text = ".";
             // 
             // label7
             // 
