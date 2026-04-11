@@ -28,13 +28,9 @@
         /// </summary>
         private void InitializeComponent()
         {
+            DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
             groupBox1 = new GroupBox();
             dataGridView = new DataGridView();
-            ID = new DataGridViewTextBoxColumn();
-            MaPhieuNhap = new DataGridViewTextBoxColumn();
-            TenNhanVien = new DataGridViewTextBoxColumn();
-            NgayNhap = new DataGridViewTextBoxColumn();
-            TongTien = new DataGridViewTextBoxColumn();
             btnXoa = new Button();
             btnSua = new Button();
             btnThem = new Button();
@@ -45,6 +41,12 @@
             label2 = new Label();
             txtTimKiem = new TextBox();
             btnLamMoi = new Button();
+            ID = new DataGridViewTextBoxColumn();
+            MaPhieuNhap = new DataGridViewTextBoxColumn();
+            TenNhanVien = new DataGridViewTextBoxColumn();
+            NgayNhap = new DataGridViewTextBoxColumn();
+            TongTien = new DataGridViewTextBoxColumn();
+            XemChiTiet = new DataGridViewLinkColumn();
             groupBox1.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)dataGridView).BeginInit();
             tableLayoutPanel1.SuspendLayout();
@@ -56,7 +58,7 @@
             groupBox1.Controls.Add(dataGridView);
             groupBox1.Location = new Point(9, 226);
             groupBox1.Name = "groupBox1";
-            groupBox1.Size = new Size(1216, 356);
+            groupBox1.Size = new Size(1216, 265);
             groupBox1.TabIndex = 1;
             groupBox1.TabStop = false;
             groupBox1.Text = "Danh sách phiếu nhập";
@@ -68,54 +70,15 @@
             dataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
             dataGridView.BackgroundColor = Color.PeachPuff;
             dataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            dataGridView.Columns.AddRange(new DataGridViewColumn[] { ID, MaPhieuNhap, TenNhanVien, NgayNhap, TongTien });
+            dataGridView.Columns.AddRange(new DataGridViewColumn[] { ID, MaPhieuNhap, TenNhanVien, NgayNhap, TongTien, XemChiTiet });
             dataGridView.Dock = DockStyle.Fill;
             dataGridView.Location = new Point(3, 35);
             dataGridView.Name = "dataGridView";
             dataGridView.ReadOnly = true;
             dataGridView.RowHeadersWidth = 82;
-            dataGridView.Size = new Size(1210, 318);
+            dataGridView.Size = new Size(1210, 227);
             dataGridView.TabIndex = 0;
-            // 
-            // ID
-            // 
-            ID.DataPropertyName = "ID";
-            ID.HeaderText = "ID";
-            ID.MinimumWidth = 10;
-            ID.Name = "ID";
-            ID.ReadOnly = true;
-            // 
-            // MaPhieuNhap
-            // 
-            MaPhieuNhap.DataPropertyName = "MaPhieuNhap";
-            MaPhieuNhap.HeaderText = "Mã phiếu nhập";
-            MaPhieuNhap.MinimumWidth = 10;
-            MaPhieuNhap.Name = "MaPhieuNhap";
-            MaPhieuNhap.ReadOnly = true;
-            // 
-            // TenNhanVien
-            // 
-            TenNhanVien.DataPropertyName = "TenNhanVien";
-            TenNhanVien.HeaderText = "Nhân viên";
-            TenNhanVien.MinimumWidth = 10;
-            TenNhanVien.Name = "TenNhanVien";
-            TenNhanVien.ReadOnly = true;
-            // 
-            // NgayNhap
-            // 
-            NgayNhap.DataPropertyName = "NgayNhap";
-            NgayNhap.HeaderText = "Ngày nhập";
-            NgayNhap.MinimumWidth = 10;
-            NgayNhap.Name = "NgayNhap";
-            NgayNhap.ReadOnly = true;
-            // 
-            // TongTien
-            // 
-            TongTien.DataPropertyName = "TongTien";
-            TongTien.HeaderText = "Tổng tiền";
-            TongTien.MinimumWidth = 10;
-            TongTien.Name = "TongTien";
-            TongTien.ReadOnly = true;
+            dataGridView.CellContentClick += dataGridView_CellContentClick;
             // 
             // btnXoa
             // 
@@ -238,6 +201,56 @@
             btnLamMoi.UseVisualStyleBackColor = true;
             btnLamMoi.Click += btnLamMoi_Click;
             // 
+            // ID
+            // 
+            ID.DataPropertyName = "ID";
+            ID.HeaderText = "ID";
+            ID.MinimumWidth = 10;
+            ID.Name = "ID";
+            ID.ReadOnly = true;
+            // 
+            // MaPhieuNhap
+            // 
+            MaPhieuNhap.DataPropertyName = "MaPhieuNhap";
+            MaPhieuNhap.HeaderText = "Mã phiếu nhập";
+            MaPhieuNhap.MinimumWidth = 10;
+            MaPhieuNhap.Name = "MaPhieuNhap";
+            MaPhieuNhap.ReadOnly = true;
+            // 
+            // TenNhanVien
+            // 
+            TenNhanVien.DataPropertyName = "TenNhanVien";
+            TenNhanVien.HeaderText = "Nhân viên";
+            TenNhanVien.MinimumWidth = 10;
+            TenNhanVien.Name = "TenNhanVien";
+            TenNhanVien.ReadOnly = true;
+            // 
+            // NgayNhap
+            // 
+            NgayNhap.DataPropertyName = "NgayNhap";
+            NgayNhap.HeaderText = "Ngày nhập";
+            NgayNhap.MinimumWidth = 10;
+            NgayNhap.Name = "NgayNhap";
+            NgayNhap.ReadOnly = true;
+            // 
+            // TongTien
+            // 
+            TongTien.DataPropertyName = "TongTien";
+            TongTien.HeaderText = "Tổng tiền";
+            TongTien.MinimumWidth = 10;
+            TongTien.Name = "TongTien";
+            TongTien.ReadOnly = true;
+            // 
+            // XemChiTiet
+            // 
+            XemChiTiet.DataPropertyName = "XemChiTiet";
+            dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            XemChiTiet.DefaultCellStyle = dataGridViewCellStyle1;
+            XemChiTiet.HeaderText = "Chi tiết";
+            XemChiTiet.MinimumWidth = 10;
+            XemChiTiet.Name = "XemChiTiet";
+            XemChiTiet.ReadOnly = true;
+            // 
             // frmPhieuNhap
             // 
             AutoScaleDimensions = new SizeF(13F, 32F);
@@ -265,11 +278,6 @@
         #endregion
         private GroupBox groupBox1;
         private DataGridView dataGridView;
-        private DataGridViewTextBoxColumn ID;
-        private DataGridViewTextBoxColumn MaPhieuNhap;
-        private DataGridViewTextBoxColumn TenNhanVien;
-        private DataGridViewTextBoxColumn NgayNhap;
-        private DataGridViewTextBoxColumn TongTien;
         private Button btnXoa;
         private Button btnSua;
         private Button btnThem;
@@ -280,5 +288,11 @@
         private Label label2;
         private TextBox txtTimKiem;
         private Button btnLamMoi;
+        private DataGridViewTextBoxColumn ID;
+        private DataGridViewTextBoxColumn MaPhieuNhap;
+        private DataGridViewTextBoxColumn TenNhanVien;
+        private DataGridViewTextBoxColumn NgayNhap;
+        private DataGridViewTextBoxColumn TongTien;
+        private DataGridViewLinkColumn XemChiTiet;
     }
 }

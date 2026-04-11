@@ -249,11 +249,28 @@ namespace QuanLyCuaHangTapHoa.Forms
             }
 
             string ten = txtHoVaTen.Text;
+            int idDangChon = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value);
+            int idNguoiDungHienTai = ((frmMain)this.MdiParent).GetCurrentUserId();
+
+            if (idDangChon == idNguoiDungHienTai)
+            {
+                MessageBox.Show("Bạn không thể tự xóa tài khoản đang đăng nhập của chính mình!", "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Stop);
+                return;
+            }
 
             if (MessageBox.Show($"Bạn có chắc muốn xóa nhân viên '{ten}' không?\nHành động này không thể hoàn tác.",
                 "Xác nhận xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 return;
 
+            string matKhauHash = ((frmMain)this.MdiParent).GetCurrentMatKhauHash();   // ← Gọi hàm từ frmMain
+
+            using (var f = new frmXacNhanXoa($"Bạn có chắc chắn muốn xóa nhân viên '{ten}'?\nHành động này không thể hoàn tác.", matKhauHash))
+            {
+                if (f.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+            }
             try
             {
                 _currentId = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value);

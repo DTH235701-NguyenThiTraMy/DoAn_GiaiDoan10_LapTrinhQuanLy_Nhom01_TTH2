@@ -255,40 +255,59 @@ namespace QuanLyCuaHangTapHoa.Forms
 
         private void btnXoa_Click(object sender, EventArgs e)
         {
+            // 1. Kiểm tra xem đã chọn sản phẩm trên lưới chưa
             if (dataGridView.CurrentRow == null)
             {
                 MessageBox.Show("Vui lòng chọn sản phẩm cần xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (MessageBox.Show($"Bạn chắc chắn muốn xóa sản phẩm '{txtTenSanPham.Text}'?",
+            string tenSP = txtTenSanPham.Text;
+
+            // 2. Xác nhận cơ bản bằng MessageBox
+            if (MessageBox.Show($"Bạn chắc chắn muốn xóa sản phẩm '{tenSP}'?\nHành động này không thể hoàn tác.",
                 "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
                 return;
+
+            // 3. Yêu cầu nhập mật khẩu xác nhận từ Form chính (frmMain)
+            string matKhauHash = ((frmMain)this.MdiParent).GetCurrentMatKhauHash();
+
+            using (var f = new frmXacNhanXoa($"Để bảo mật, vui lòng nhập mật khẩu của bạn để xóa sản phẩm '{tenSP}'", matKhauHash))
+            {
+                if (f.ShowDialog() != DialogResult.OK)
+                {
+                    return; // Nếu nhập sai mật khẩu hoặc nhấn Hủy thì thoát
+                }
+            }
 
             try
             {
                 _currentId = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value);
 
+                // 4. Kiểm tra ràng buộc dữ liệu (Tránh lỗi khóa ngoại)
                 if (_context.HoaDon_ChiTiet.Any(x => x.SanPhamID == _currentId) ||
                     _context.PhieuNhap_ChiTiet.Any(x => x.SanPhamID == _currentId))
                 {
-                    MessageBox.Show("Không thể xóa! Sản phẩm đã phát sinh giao dịch.", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    MessageBox.Show("Không thể xóa! Sản phẩm này đã có lịch sử giao dịch (Hóa đơn hoặc Phiếu nhập).",
+                        "Cảnh báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
+                // 5. Tiến hành xóa trong Cơ sở dữ liệu
                 var sp = _context.SanPham.Find(_currentId);
                 if (sp != null)
                 {
                     _context.SanPham.Remove(sp);
                     _context.SaveChanges();
-                    MessageBox.Show("Đã xóa thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("Đã xóa sản phẩm thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
 
+                // 6. Cập nhật lại giao diện
                 LoadDataToGrid();
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Lỗi: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show("Lỗi hệ thống: " + ex.Message, "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

@@ -268,6 +268,21 @@ namespace QuanLyCuaHangTapHoa.Forms
         {
             MoForm(new frmTrangChu());
         }
+        
+        public string GetCurrentMatKhauHash()
+        {
+            using (var context = new QLTHDbContext())
+            {
+                var nv = context.NhanVien.Find(currentUserId);
+                return nv != null ? nv.MatKhau : "";
+            }
+        }
+
+        // Thêm hàm này để chặn trường hợp quản lý tự xóa chính tài khoản của mình
+        public int GetCurrentUserId()
+        {
+            return currentUserId;
+        }
     }
 
 }

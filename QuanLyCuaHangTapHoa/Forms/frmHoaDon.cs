@@ -111,41 +111,63 @@ namespace QuanLyCuaHangTapHoa.Forms
         // ================= NÚT XÓA =================
         private void btnXoa_Click(object sender, EventArgs e)
         {
+            // 1. Kiểm tra lựa chọn trên lưới
             if (dataGridView.CurrentRow == null) return;
 
             string maHD = dataGridView.CurrentRow.Cells["MaHoaDon"].Value.ToString();
 
+            // 2. Xác nhận lần 1: Cảnh báo về việc hoàn kho
             var result = MessageBox.Show($"Xác nhận xóa hóa đơn: {maHD}?\nLưu ý: Hệ thống sẽ tự động hoàn trả số lượng hàng vào kho.",
-                                        "Xác nhận", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                                        "Xác nhận xóa hóa đơn", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
 
-            if (result == DialogResult.Yes)
+            if (result != DialogResult.Yes) return;
+
+            // 3. Xác nhận lần 2: Yêu cầu nhập mật khẩu để thực hiện hoàn kho và xóa doanh thu
+            string matKhauHash = ((frmMain)this.MdiParent).GetCurrentMatKhauHash();
+
+            using (var f = new frmXacNhanXoa($"Nhập mật khẩu để xác nhận xóa hóa đơn {maHD} và cập nhật lại kho hàng.", matKhauHash))
             {
-                try
+                if (f.ShowDialog() != DialogResult.OK)
                 {
-                    int deleteId = (int)dataGridView.CurrentRow.Cells["ID"].Value;
-                    using (var db = new QLTHDbContext())
-                    {
-                        var hd = db.HoaDon.Include(h => h.HoaDon_ChiTiet).FirstOrDefault(h => h.ID == deleteId);
-                        if (hd != null)
-                        {
-                            foreach (var item in hd.HoaDon_ChiTiet)
-                            {
-                                var sp = db.SanPham.Find(item.SanPhamID);
-                                if (sp != null) sp.SoLuongTon += item.SoLuongBan;
-                            }
-                            db.HoaDon_ChiTiet.RemoveRange(hd.HoaDon_ChiTiet);
-                            db.HoaDon.Remove(hd);
-                            db.SaveChanges();
+                    return; // Thoát nếu sai mật khẩu hoặc nhấn Hủy
+                }
+            }
 
-                            MessageBox.Show($"Đã xóa hóa đơn {maHD} thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                            LoadData();
+            // 4. Thực hiện logic xóa và hoàn kho
+            try
+            {
+                int deleteId = (int)dataGridView.CurrentRow.Cells["ID"].Value;
+                using (var db = new QLTHDbContext())
+                {
+                    // Lấy hóa đơn kèm theo chi tiết để duyệt danh sách sản phẩm
+                    var hd = db.HoaDon.Include(h => h.HoaDon_ChiTiet).FirstOrDefault(h => h.ID == deleteId);
+
+                    if (hd != null)
+                    {
+                        // Hoàn trả số lượng hàng vào kho cho từng sản phẩm trong hóa đơn
+                        foreach (var item in hd.HoaDon_ChiTiet)
+                        {
+                            var sp = db.SanPham.Find(item.SanPhamID);
+                            if (sp != null)
+                            {
+                                sp.SoLuongTon += item.SoLuongBan; // Cộng lại kho
+                            }
                         }
+
+                        // Xóa chi tiết hóa đơn trước, sau đó xóa hóa đơn chính
+                        db.HoaDon_ChiTiet.RemoveRange(hd.HoaDon_ChiTiet);
+                        db.HoaDon.Remove(hd);
+
+                        db.SaveChanges();
+
+                        MessageBox.Show($"Đã xóa hóa đơn {maHD} và hoàn kho thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        LoadData(); // Tải lại danh sách
                     }
                 }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"Không thể xóa hóa đơn. Lỗi: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Lỗi hệ thống khi xóa hóa đơn: {ex.Message}", "Lỗi", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }               
 

@@ -101,33 +101,54 @@ namespace QuanLyCuaHangTapHoa.Forms
         // ==================== NÚT XÓA ====================
         private void btnXoa_Click(object sender, EventArgs e)
         {
+            // 1. Kiểm tra xem đã chọn dòng nào chưa
             if (dataGridView.CurrentRow == null)
             {
                 MessageBox.Show("Vui lòng chọn một khách hàng để xóa!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;
             }
 
-            if (MessageBox.Show($"Bạn có chắc chắn muốn xóa khách hàng '{txtHoVaTen.Text}' không?", "Xác nhận xóa",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes)
-            {
-                try
-                {
-                    id = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value);
-                    KhachHang kh = context.KhachHang.Find(id);
+            string tenKH = txtHoVaTen.Text;
 
-                    if (kh != null)
-                    {
-                        context.KhachHang.Remove(kh);
-                        context.SaveChanges();
-                        MessageBox.Show("Xóa khách hàng thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                        LoadData();
-                    }
-                }
-                catch (Exception ex)
+            // 2. Hỏi xác nhận cơ bản trước
+            if (MessageBox.Show($"Bạn có chắc chắn muốn xóa khách hàng '{tenKH}' không?\nHành động này không thể hoàn tác.",
+                "Xác nhận xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            {
+                return;
+            }
+
+            // 3. Yêu cầu nhập mật khẩu xác nhận (Lấy hash từ Form chính)
+            string matKhauHash = ((frmMain)this.MdiParent).GetCurrentMatKhauHash();
+
+            using (var f = new frmXacNhanXoa($"Để bảo mật, vui lòng nhập mật khẩu của bạn để xóa khách hàng '{tenKH}'", matKhauHash))
+            {
+                // Nếu nhập sai mật khẩu hoặc bấm Hủy thì dừng lại
+                if (f.ShowDialog() != DialogResult.OK)
                 {
-                    // Lỗi này thường xảy ra nếu Khách hàng đã có Hóa Đơn (bị dính khóa ngoại)
-                    MessageBox.Show("Không thể xóa khách hàng này vì họ đã phát sinh giao dịch (Hóa đơn) trong hệ thống!", "Lỗi hệ thống", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return;
                 }
+            }
+
+            // 4. Thực hiện xóa sau khi đã xác thực mật khẩu thành công
+            try
+            {
+                int idXoa = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value);
+                var kh = context.KhachHang.Find(idXoa);
+
+                if (kh != null)
+                {
+                    context.KhachHang.Remove(kh);
+                    context.SaveChanges();
+
+                    MessageBox.Show("Xóa khách hàng thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    LoadData();
+                }
+            }
+            catch (Exception)
+            {
+                // Thông báo lỗi khóa ngoại nếu khách hàng đã có hóa đơn
+                MessageBox.Show("Không thể xóa khách hàng này vì họ đã có lịch sử mua hàng (Hóa đơn) trong hệ thống!",
+                    "Lỗi hệ thống", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

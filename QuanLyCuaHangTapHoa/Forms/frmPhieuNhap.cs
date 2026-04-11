@@ -21,71 +21,63 @@ namespace QuanLyCuaHangTapHoa.Forms
         private void frmPhieuNhap_Load(object sender, EventArgs e)
         {
             dataGridView.AutoGenerateColumns = false;
-            LoadDataToGrid();   // Load ban đầu
+            LoadDataToGrid();
         }
 
         /// <summary>
-        /// Load dữ liệu phiếu nhập + hỗ trợ tìm kiếm
+        /// Load dữ liệu + hỗ trợ tìm kiếm
         /// </summary>
         private void LoadDataToGrid(string keyword = "")
         {
             try
             {
-                // 1. Tạo query cơ bản (Server-side)
+                // Bước 1: Query cơ bản
                 var query = _context.PhieuNhap.AsNoTracking();
 
-                // 2. Lọc theo từ khóa (Nếu có)
+                // Bước 2: Lọc từ khóa (nếu có)
                 if (!string.IsNullOrWhiteSpace(keyword))
                 {
                     string k = keyword.ToLower().Trim();
 
-                    // Lưu ý: Kiểm tra null trước khi ToLower để tránh crash
                     query = query.Where(p =>
-                        (p.MaPhieuNhap != null && p.MaPhieuNhap.ToLower().Contains(k)) ||
-                        (p.NhanVien != null && p.NhanVien.HoVaTen != null && p.NhanVien.HoVaTen.ToLower().Contains(k))
-                    );
+                        (p.MaPhieuNhap != null && EF.Functions.Like(p.MaPhieuNhap, $"%{k}%")) ||
+                        (p.NhanVien != null && p.NhanVien.HoVaTen != null && EF.Functions.Like(p.NhanVien.HoVaTen, $"%{k}%")));
                 }
 
-                // 3. Thực hiện Select và Sum (EF Core sẽ dịch cái này sang SQL SUM cực nhanh)
+                // Bước 3: Include (phải đặt SAU Where)
+                query = query
+                    .Include(p => p.NhanVien)
+                    .Include(p => p.PhieuNhap_ChiTiet);
+
+                // Bước 4: Select dữ liệu
                 var data = query
                     .OrderByDescending(p => p.ID)
                     .Select(p => new
                     {
                         p.ID,
                         p.MaPhieuNhap,
-                        // Dùng toán tử điều kiện để tránh null Nhân viên
                         TenNhanVien = p.NhanVien != null ? p.NhanVien.HoVaTen : "N/A",
                         p.NgayNhap,
-                        // Tính tổng tiền ngay trên Server
-                        TongTien = p.PhieuNhap_ChiTiet.Sum(c => (double?)c.SoLuongNhap * c.DonGiaNhap) ?? 0
+                        TongTien = p.PhieuNhap_ChiTiet.Sum(c => (decimal)c.SoLuongNhap * c.DonGiaNhap),
+                        XemChiTiet = "Xem chi tiết"
                     })
-                    .ToList(); // Đổ dữ liệu về RAM ở đây
+                    .ToList();
 
-                // 4. Lọc bổ sung theo Ngày (Client-side) - Chỉ chạy nếu bước trên chưa tìm thấy gì bằng chữ
+                // Bước 5: Lọc bổ sung theo ngày (client-side)
                 if (!string.IsNullOrWhiteSpace(keyword))
                 {
-                    // Nếu tìm theo mã/tên không ra, ta thử lọc kết quả 'data' theo ngày
-                    var filteredByDate = data.Where(p =>
+                    var dateFiltered = data.Where(p =>
                         p.NgayNhap.ToString("dd/MM/yyyy").Contains(keyword) ||
-                        p.NgayNhap.ToString("yyyy-MM-dd").Contains(keyword)
-                    ).ToList();
+                        p.NgayNhap.ToString("yyyy-MM-dd").Contains(keyword))
+                        .ToList();
 
-                    // Nếu tìm theo ngày có kết quả thì ưu tiên hiển thị
-                    if (filteredByDate.Any())
-                    {
-                        dataGridView.DataSource = filteredByDate;
-                    }
-                    else
-                    {
-                        dataGridView.DataSource = data;
-                    }
+                    dataGridView.DataSource = dateFiltered.Any() ? dateFiltered : data;
                 }
                 else
                 {
                     dataGridView.DataSource = data;
                 }
 
-                // 5. Định dạng lại Grid (Giữ nguyên code cũ của bạn)
                 FormatGridColumns();
             }
             catch (Exception ex)
@@ -94,10 +86,10 @@ namespace QuanLyCuaHangTapHoa.Forms
             }
         }
 
-        // Tách hàm định dạng riêng cho sạch code
         private void FormatGridColumns()
         {
-            if (dataGridView.Columns["ID"] != null) dataGridView.Columns["ID"].Visible = false;
+            if (dataGridView.Columns["ID"] != null)
+                dataGridView.Columns["ID"].Visible = false;
 
             if (dataGridView.Columns["TongTien"] != null)
             {
@@ -108,7 +100,7 @@ namespace QuanLyCuaHangTapHoa.Forms
 
             if (dataGridView.Columns["NgayNhap"] != null)
             {
-                dataGridView.Columns["NgayNhap"].DefaultCellStyle.Format = "dd/MM/yyyy HH:mm";
+                dataGridView.Columns["NgayNhap"].DefaultCellStyle.Format = "dd/MM/yyyy";
                 dataGridView.Columns["NgayNhap"].HeaderText = "Ngày Nhập";
             }
 
@@ -124,13 +116,19 @@ namespace QuanLyCuaHangTapHoa.Forms
             LoadDataToGrid(txtTimKiem.Text);
         }
 
+        private void btnLamMoi_Click(object sender, EventArgs e)
+        {
+            txtTimKiem.Clear();
+            LoadDataToGrid();
+        }
+
         // ====================== CÁC NÚT CHỨC NĂNG ======================
         private void btnThem_Click(object sender, EventArgs e)
         {
             using (var f = new frmPhieuNhap_ChiTiet())
             {
                 f.ShowDialog();
-                LoadDataToGrid(txtTimKiem.Text);   // Giữ từ khóa tìm kiếm sau khi thêm
+                LoadDataToGrid(txtTimKiem.Text);
             }
         }
 
@@ -149,40 +147,63 @@ namespace QuanLyCuaHangTapHoa.Forms
 
         private void btnXoa_Click(object sender, EventArgs e)
         {
+            // 1. Kiểm tra lựa chọn trên lưới
             if (dataGridView.CurrentRow == null) return;
 
-            if (MessageBox.Show("Bạn có chắc muốn xóa phiếu nhập này?\nTất cả chi tiết và tồn kho sẽ được hoàn lại.",
+            // 2. Xác nhận lần 1 bằng thông báo
+            if (MessageBox.Show("Bạn có chắc muốn xóa phiếu nhập này?\nLưu ý: Số lượng hàng trong kho sẽ bị trừ tương ứng.",
                 "Xác nhận xóa", MessageBoxButtons.YesNo, MessageBoxIcon.Warning) != DialogResult.Yes)
                 return;
 
-            int id = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value);
+            // 3. Xác nhận lần 2 bằng mật khẩu
+            string matKhauHash = ((frmMain)this.MdiParent).GetCurrentMatKhauHash();
 
+            using (var f = new frmXacNhanXoa("Vui lòng nhập mật khẩu để xác nhận trừ tồn kho và xóa phiếu nhập này.", matKhauHash))
+            {
+                if (f.ShowDialog() != DialogResult.OK)
+                {
+                    return;
+                }
+            }
+
+            int deleteId = Convert.ToInt32(dataGridView.CurrentRow.Cells["ID"].Value);
+
+            // 4. Thực hiện xóa trong Transaction
             try
             {
                 using (var transaction = _context.Database.BeginTransaction())
                 {
                     var pn = _context.PhieuNhap
                         .Include(p => p.PhieuNhap_ChiTiet)
-                        .FirstOrDefault(p => p.ID == id);
+                        .FirstOrDefault(p => p.ID == deleteId);
 
                     if (pn == null) return;
 
-                    // Hoàn tồn kho
+                    // Hoàn tồn kho: Xóa phiếu nhập thì phải TRỪ số lượng trong kho
                     foreach (var ct in pn.PhieuNhap_ChiTiet)
                     {
                         var sp = _context.SanPham.Find(ct.SanPhamID);
                         if (sp != null)
+                        {
                             sp.SoLuongTon -= ct.SoLuongNhap;
+
+                            // Kiểm tra nếu kho bị âm sau khi trừ
+                            //if (sp.SoLuongTon < 0)
+                            //{
+                                
+                            //}
+                        }
                     }
 
+                    // Xóa chi tiết và phiếu nhập
                     _context.PhieuNhap_ChiTiet.RemoveRange(pn.PhieuNhap_ChiTiet);
                     _context.PhieuNhap.Remove(pn);
 
                     _context.SaveChanges();
-                    transaction.Commit();
+                    transaction.Commit(); 
                 }
 
-                MessageBox.Show("Xóa phiếu nhập thành công!", "Thông báo", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("Xóa phiếu nhập và cập nhật tồn kho thành công!", "Thành công", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 LoadDataToGrid(txtTimKiem.Text);
             }
             catch (Exception ex)
@@ -211,7 +232,7 @@ namespace QuanLyCuaHangTapHoa.Forms
                 {
                     using (XLWorkbook wb = new XLWorkbook())
                     {
-                        // ==================== SHEET 1: DANH SÁCH PHIẾU ====================
+                        // Sheet 1: Danh sách phiếu
                         var dtPN = new DataTable();
                         dtPN.Columns.Add("MaPhieuNhap");
                         dtPN.Columns.Add("Nhân viên");
@@ -227,21 +248,16 @@ namespace QuanLyCuaHangTapHoa.Forms
                         foreach (var pn in dsPN)
                         {
                             var tongTien = pn.PhieuNhap_ChiTiet.Sum(c => (decimal)c.SoLuongNhap * c.DonGiaNhap);
-                            dtPN.Rows.Add(
-                                pn.MaPhieuNhap,
-                                pn.NhanVien.HoVaTen,
-                                pn.NgayNhap.ToString("dd/MM/yyyy"),
-                                tongTien
-                            );
+                            dtPN.Rows.Add(pn.MaPhieuNhap, pn.NhanVien?.HoVaTen ?? "N/A",
+                                pn.NgayNhap.ToString("dd/MM/yyyy"), tongTien);
                         }
 
                         var sheet1 = wb.Worksheets.Add(dtPN, "PhieuNhap");
                         sheet1.Row(1).Style.Font.Bold = true;
                         sheet1.Columns().AdjustToContents();
-                        sheet1.SheetView.FreezeRows(1);
                         sheet1.Column("D").Style.NumberFormat.Format = "#,##0";
 
-                        // ==================== SHEET 2: CHI TIẾT ====================
+                        // Sheet 2: Chi tiết
                         var dtCT = new DataTable();
                         dtCT.Columns.Add("MaPhieuNhap");
                         dtCT.Columns.Add("Sản phẩm");
@@ -259,17 +275,15 @@ namespace QuanLyCuaHangTapHoa.Forms
                         {
                             dtCT.Rows.Add(
                                 ct.PhieuNhap.MaPhieuNhap,
-                                ct.SanPham.TenSanPham,
+                                ct.SanPham?.TenSanPham ?? "N/A",
                                 ct.SoLuongNhap,
                                 ct.DonGiaNhap,
-                                ct.SoLuongNhap * ct.DonGiaNhap
-                            );
+                                ct.SoLuongNhap * ct.DonGiaNhap);
                         }
 
                         var sheet2 = wb.Worksheets.Add(dtCT, "PhieuNhap_ChiTiet");
                         sheet2.Row(1).Style.Font.Bold = true;
                         sheet2.Columns().AdjustToContents();
-                        sheet2.SheetView.FreezeRows(1);
                         sheet2.Column("E").Style.NumberFormat.Format = "#,##0";
 
                         wb.SaveAs(save.FileName);
@@ -284,16 +298,28 @@ namespace QuanLyCuaHangTapHoa.Forms
             }
         }
 
+        // Xem chi tiết khi click cột "Xem chi tiết"
+        private void dataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex < 0) return;
+
+            if (dataGridView.Columns[e.ColumnIndex].Name == "XemChiTiet")
+            {
+                int id = Convert.ToInt32(dataGridView.Rows[e.RowIndex].Cells["ID"].Value);
+
+                using (var f = new frmPhieuNhap_ChiTiet(id))
+                {
+                    f.ShowDialog();
+                }
+
+                LoadDataToGrid(txtTimKiem.Text);
+            }
+        }
+
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
             _context?.Dispose();
             base.OnFormClosing(e);
-        }
-
-        private void btnLamMoi_Click(object sender, EventArgs e)
-        {
-            txtTimKiem.Clear();
-            LoadDataToGrid();
         }
     }
 }
