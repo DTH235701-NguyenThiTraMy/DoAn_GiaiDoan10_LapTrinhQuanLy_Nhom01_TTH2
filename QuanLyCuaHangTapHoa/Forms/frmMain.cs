@@ -230,7 +230,7 @@ namespace QuanLyCuaHangTapHoa.Forms
         {
             Process.Start(new ProcessStartInfo
             {
-                FileName = "https://dth235701-nguyenthitramy.github.io/qlth-help/index.html",
+                FileName = "https://dth235701-nguyenthitramy.github.io/qlth-help/HDSD.html",
                 UseShellExecute = true
             });
         }
@@ -239,7 +239,7 @@ namespace QuanLyCuaHangTapHoa.Forms
         {
             Process.Start(new ProcessStartInfo
             {
-                FileName = "https://dth235701-nguyenthitramy.github.io/qlth-help/about.html",
+                FileName = "https://dth235701-nguyenthitramy.github.io/qlth-help/TTPM.html",
                 UseShellExecute = true
             });
         }
